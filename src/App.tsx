@@ -1,8 +1,15 @@
+
+import BottomNavigation from './components/BottomNavigation/BottomNavigation';
+
 function App() {
   return (
-    <div>
-      <h1>프로젝트 시작 - 첫 pr 테스트</h1>
-    </div>
+    <>
+      <main style={{ paddingBottom: '104px' }}>
+        {/* 페이지 콘텐츠 */}
+      </main>
+
+      <BottomNavigation />
+    </>
   );
 }
 
