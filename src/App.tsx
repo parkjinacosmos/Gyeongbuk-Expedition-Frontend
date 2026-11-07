@@ -1,13 +1,10 @@
-
+import ExplorePage from './pages/Explore/ExplorePage';
 import BottomNavigation from './components/BottomNavigation/BottomNavigation';
 
 function App() {
   return (
     <>
-      <main style={{ paddingBottom: '104px' }}>
-        {/* 페이지 콘텐츠 */}
-      </main>
-
+      <ExplorePage />
       <BottomNavigation />
     </>
   );
