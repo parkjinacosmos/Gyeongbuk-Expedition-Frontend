@@ -1,0 +1,64 @@
+
+.game-menu__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  border: 0;
+  background: transparent;
+  cursor: default;
+}
+
+.game-menu {
+  position: fixed;
+  z-index: 91;
+  top: 130px;
+  right: max(12px, calc((100vw - 390px) / 2 + 12px));
+  width: 188px;
+  padding: 7px;
+  border: 1.5px solid #a67b45;
+  border-radius: 14px;
+  background: linear-gradient(#fffbe7, #ffe3b8);
+  box-shadow: 0 4px 8px rgb(91 84 38 / 20%);
+}
+
+.game-menu button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 44px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #54371f;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.game-menu button:hover {
+  background: #f5dfaa;
+}
+
+.game-menu__content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.game-menu__icon {
+  display: block;
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.game-menu__arrow {
+  margin-left: 6px;
+  color: #8b6235;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+}

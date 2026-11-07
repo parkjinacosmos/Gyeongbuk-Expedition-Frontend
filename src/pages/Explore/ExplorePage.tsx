@@ -8,6 +8,8 @@ import {
   type ExploreUser,
 } from '../../api/explore';
 
+import GameMenu from '../../components/GameMenu/GameMenu';
+
 import appleImage from '../../assets/explore/apple.png';
 import mackerelImage from '../../assets/explore/mackerel.png';
 import ginsengImage from '../../assets/explore/ginseng.png';
@@ -25,8 +27,14 @@ import menuImage from '../../assets/explore/menu.png';
 import plusImage from '../../assets/explore/plus.png';
 import profileImage from '../../assets/explore/profile.png';
 
-// 디자인에 필요한 지역별 고정 정보
-// 실제 해금 상태와 보상 정보는 API에서 가져옵니다.
+// ========================================
+// Types
+// ========================================
+
+interface ExplorePageProps {
+  onStartExplore: () => void;
+}
+
 type RegionDesign = {
   id: number;
   name: string;
@@ -35,6 +43,16 @@ type RegionDesign = {
   x: number;
   y: number;
 };
+
+type DisplayRegion = RegionDesign & {
+  apiData: ExploreRegion | null;
+  status: 'current' | 'unlocked' | 'locked';
+  requirement: string;
+};
+
+// ========================================
+// Region Design Data
+// ========================================
 
 const regionDesigns: RegionDesign[] = [
   {
@@ -103,11 +121,9 @@ const regionDesigns: RegionDesign[] = [
   },
 ];
 
-type DisplayRegion = RegionDesign & {
-  apiData: ExploreRegion | null;
-  status: 'current' | 'unlocked' | 'locked';
-  requirement: string;
-};
+// ========================================
+// Helpers
+// ========================================
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) {
@@ -117,27 +133,35 @@ function getErrorMessage(error: unknown): string {
   return '알 수 없는 오류가 발생했어요.';
 }
 
-export default function ExplorePage() {
+// ========================================
+// Component
+// ========================================
+
+export default function ExplorePage({
+  onStartExplore,
+}: ExplorePageProps) {
   const [user, setUser] = useState<ExploreUser | null>(null);
 
-  const [apiRegions, setApiRegions] = useState<ExploreRegion[]>([]);
+  const [apiRegions, setApiRegions] = useState<
+    ExploreRegion[]
+  >([]);
 
   const [selectedId, setSelectedId] = useState(1);
-
   const [notice, setNotice] = useState('');
 
   const [loading, setLoading] = useState(true);
-
   const [moving, setMoving] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  // 이동 요청에 사용한 키를 보관합니다.
-  // 네트워크 오류로 재시도할 때 같은 키를 재사용합니다.
   const [pendingMove, setPendingMove] = useState<{
     regionId: number;
     key: string;
   } | null>(null);
 
-  // 최초 화면 진입 시 사용자 정보와 지역 목록 조회
+  // ========================================
+  // Initial Data Loading
+  // ========================================
+
   useEffect(() => {
     let cancelled = false;
 
@@ -175,52 +199,55 @@ export default function ExplorePage() {
     };
   }, []);
 
-  // 서버 데이터와 디자인 정보를 결합
-  const regions: DisplayRegion[] = regionDesigns.map((design) => {
-    const apiData =
-      apiRegions.find((region) => region.id === design.id) ?? null;
+  // ========================================
+  // Combine API Data with Design
+  // ========================================
 
-    const isCurrent =
-      user?.cur_region.id === design.id;
+  const regions: DisplayRegion[] = regionDesigns.map(
+    (design) => {
+      const apiData =
+        apiRegions.find(
+          (region) => region.id === design.id,
+        ) ?? null;
 
-    let status: DisplayRegion['status'] = 'locked';
-    let requirement = '아직 열리지 않은 지역';
+      const isCurrent =
+        user?.cur_region.id === design.id;
 
-    if (isCurrent) {
-      status = 'current';
-      requirement = '현재 지역';
-    } else if (apiData?.status === 'UNLOCKED') {
-      status = 'unlocked';
-      requirement = '해금 완료';
-    } else if (apiData?.status === 'LOCKED') {
-      status = 'locked';
+      let status: DisplayRegion['status'] = 'locked';
+      let requirement = '아직 열리지 않은 지역';
 
-      if (apiData.unlock) {
-        const {
-          specialty_name,
-          current_pieces,
-          required_pieces,
-        } = apiData.unlock;
+      if (isCurrent) {
+        status = 'current';
+        requirement = '현재 지역';
+      } else if (apiData?.status === 'UNLOCKED') {
+        status = 'unlocked';
+        requirement = '해금 완료';
+      } else if (apiData?.status === 'LOCKED') {
+        status = 'locked';
 
-        requirement =
-          `${specialty_name} 조각 ` +
-          `${current_pieces}/${required_pieces}개`;
-      } else {
-        requirement = '잠긴 지역';
+        if (apiData.unlock) {
+          const {
+            specialty_name,
+            current_pieces,
+            required_pieces,
+          } = apiData.unlock;
+
+          requirement =
+            `${specialty_name} 조각 ` +
+            `${current_pieces}/${required_pieces}개`;
+        } else {
+          requirement = '잠긴 지역';
+        }
       }
-    }
 
-    return {
-      ...design,
-      apiData,
-      status,
-      requirement,
-    };
-  });
-
-  const selectedRegion =
-    regions.find((region) => region.id === selectedId) ??
-    regions[0];
+      return {
+        ...design,
+        apiData,
+        status,
+        requirement,
+      };
+    },
+  );
 
   const currentId = user?.cur_region.id ?? 1;
 
@@ -228,16 +255,23 @@ export default function ExplorePage() {
     regions.find((region) => region.id === currentId) ??
     regions[0];
 
-  const isCurrent = selectedRegion.id === currentId;
+  const selectedRegion =
+    regions.find((region) => region.id === selectedId) ??
+    currentRegion;
 
+  const isCurrent = selectedRegion.id === currentId;
   const isLocked = selectedRegion.status === 'locked';
 
-  // 선택한 지역으로 이동
+  // ========================================
+  // Region Selection
+  // ========================================
+
   const handleRegionSelect = async () => {
     if (loading || moving || !user) {
       return;
     }
 
+    // 잠긴 지역은 진입 불가
     if (isLocked) {
       setNotice(
         selectedRegion.apiData
@@ -247,16 +281,18 @@ export default function ExplorePage() {
       return;
     }
 
+    // 현재 탐험 중인 지역이면 바로 게임으로 이동
     if (isCurrent) {
-      setNotice('이미 탐험 중인 지역이에요.');
+      setNotice('');
+      onStartExplore();
       return;
     }
 
+    // 다른 해금 지역이면 서버에 지역 이동 요청
     try {
       setMoving(true);
       setNotice('');
 
-      // 동일 지역 이동 요청을 재시도할 때 기존 키 사용
       const request =
         pendingMove?.regionId === selectedRegion.id
           ? pendingMove
@@ -272,22 +308,21 @@ export default function ExplorePage() {
         request.key,
       );
 
-      // 이동 후 서버의 최신 상태를 다시 조회
-      const [updatedUser, updatedRegions] = await Promise.all([
-        exploreApi.getUser(),
-        exploreApi.getRegions(),
-      ]);
+      // 이동 성공 후 최신 사용자·지역 정보 조회
+      const [updatedUser, updatedRegions] =
+        await Promise.all([
+          exploreApi.getUser(),
+          exploreApi.getRegions(),
+        ]);
 
       setUser(updatedUser);
       setApiRegions(updatedRegions.regions);
+      setSelectedId(updatedUser.cur_region.id);
       setPendingMove(null);
 
-      setNotice(
-        `${updatedUser.cur_region.name} 지역으로 탐험을 변경했어요!`,
-      );
+      // 게임 화면으로 자동 이동
+      onStartExplore();
     } catch (error) {
-      // 요청이 실제로 처리됐는지 알 수 없을 때
-      // 멱등성 키를 유지하여 중복 이동을 방지합니다.
       setNotice(
         `지역 이동을 확인하지 못했어요. ${getErrorMessage(error)}`,
       );
@@ -295,6 +330,10 @@ export default function ExplorePage() {
       setMoving(false);
     }
   };
+
+  // ========================================
+  // Render
+  // ========================================
 
   return (
     <main className="explore-page">
@@ -355,8 +394,9 @@ export default function ExplorePage() {
             type="button"
             className="explore-header__menu"
             aria-label="메뉴 열기"
+            aria-expanded={menuOpen}
             onClick={() =>
-              setNotice('메뉴 기능은 준비 중이에요.')
+              setMenuOpen((prev) => !prev)
             }
           >
             <img src={menuImage} alt="" />
@@ -501,7 +541,11 @@ export default function ExplorePage() {
               onClick={() => void handleRegionSelect()}
               disabled={loading || moving}
             >
-              {moving ? '이동 중...' : '지역 선택 ›'}
+              {moving
+                ? '이동 중...'
+                : isCurrent
+                  ? '탐험 입장 ›'
+                  : '지역 선택 ›'}
             </button>
           </div>
         </section>
@@ -520,6 +564,14 @@ export default function ExplorePage() {
           </div>
         )}
       </div>
+
+      {menuOpen && (
+        <GameMenu
+          onClose={() => setMenuOpen(false)}
+          onOpenMap={() => setMenuOpen(false)}
+          onNotice={setNotice}
+        />
+      )}
     </main>
   );
 }
