@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from 'react';
 
 import {
@@ -11,6 +10,7 @@ import {
 
 import GameScene from '../../components/GameScene/GameScene';
 import GameMenu from '../../components/GameMenu/GameMenu';
+import RewardModal from '../../components/RewardModal/RewardModal';
 
 import appleImage from '../../assets/explore/apple.png';
 import goldImage from '../../assets/explore/gold.png';
@@ -217,10 +217,6 @@ export default function GamePage({
 
       try {
         await loadData();
-
-        if (mounted.current) {
-          setMessage('보상을 성공적으로 수령했어요!');
-        }
       } catch {
         if (mounted.current) {
           setMessage(
@@ -411,31 +407,24 @@ export default function GamePage({
         </section>
 
         {/* Claim Result */}
-        {result && (
-          <div
-            className="game-notice"
-            role="status"
-          >
-            <strong>보상 획득!</strong>
-
-            <span>
-              골드 +
-              {result.gained.gold.toLocaleString()}
-              {' / '}
-              경험치 +
-              {result.gained.exp.toLocaleString()}
-              {' / '}
-              {result.gained.pieces.name} 조각 +
-              {result.gained.pieces.gained}
-            </span>
-
-            {result.leveled_up && (
-              <span>
-                Lv.{result.level} 달성!
-              </span>
-            )}
-          </div>
-        )}
+       
+{result && (
+  <RewardModal
+    gold={result.gained.gold}
+    exp={result.gained.exp}
+    pieces={result.gained.pieces.gained}
+    totalGold={result.gold}
+    currentExp={result.exp}
+    totalPieces={result.gained.pieces.total}
+    explorationSeconds={result.gained.elapsed_seconds}
+    specialtyName={result.gained.pieces.name}
+    onClose={() => {
+  setResult(null);
+  onOpenMap();
+}}
+onContinue={() => setResult(null)}
+  />
+)}
 
         {/* Notice */}
         {message && (
