@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from 'react';
 
 import {
@@ -85,8 +86,7 @@ export default function GamePage({
     if (!mounted.current) return;
 
     serverOffset.current =
-      Date.parse(rewardData.server_time) -
-      Date.now();
+      Date.parse(rewardData.server_time) - Date.now();
 
     setUser(userData);
     setReward(rewardData);
@@ -105,9 +105,7 @@ export default function GamePage({
         );
       })
       .finally(() => {
-        if (mounted.current) {
-          setLoading(false);
-        }
+        if (mounted.current) setLoading(false);
       });
 
     return () => {
@@ -124,10 +122,7 @@ export default function GamePage({
       if (!Number.isFinite(start)) return;
 
       const elapsed = Math.floor(
-        (Date.now() +
-          serverOffset.current -
-          start) /
-          1000,
+        (Date.now() + serverOffset.current - start) / 1000,
       );
 
       setSeconds(
@@ -156,8 +151,7 @@ export default function GamePage({
           if (!mounted.current) return;
 
           serverOffset.current =
-            Date.parse(data.server_time) -
-            Date.now();
+            Date.parse(data.server_time) - Date.now();
 
           setReward(data);
         })
@@ -175,14 +169,11 @@ export default function GamePage({
     (region) => region.id === user?.cur_region.id,
   );
 
-  const pieces =
-    currentRegion?.specialty.pieces ?? 0;
+  const pieces = currentRegion?.specialty.pieces ?? 0;
 
   const progress = Math.min(
     100,
-    (seconds /
-      (reward?.cap_seconds || MAX_SECONDS)) *
-      100,
+    (seconds / (reward?.cap_seconds || MAX_SECONDS)) * 100,
   );
 
   const canClaim =
@@ -206,8 +197,7 @@ export default function GamePage({
     pendingKey.current = key;
 
     try {
-      const claim =
-        await exploreApi.claimIdleReward(key);
+      const claim = await exploreApi.claimIdleReward(key);
 
       pendingKey.current = null;
 
@@ -248,27 +238,19 @@ export default function GamePage({
             <img src={profileImage} alt="" />
 
             <div>
-              <strong>
-                Lv.{user?.level ?? '—'}
-              </strong>
-
-              <span>
-                {user?.name ?? '원정대원'}
-              </span>
+              <strong>Lv.{user?.level ?? '—'}</strong>
+              <span>{user?.name ?? '원정대원'}</span>
             </div>
           </div>
 
           <div className="game-header__region">
             <span>
-              현재 지역{' '}
-              {user?.cur_region.code ?? '—'}
+              현재 지역 {user?.cur_region.code ?? '—'}
             </span>
 
             <strong>
               <img src={appleImage} alt="" />
-
-              {user?.cur_region.name ??
-                '불러오는 중'}
+              {user?.cur_region.name ?? '불러오는 중'}
             </strong>
           </div>
 
@@ -280,15 +262,12 @@ export default function GamePage({
             </strong>
           </div>
 
-          {/* 배속 버튼 */}
           <button
             className="game-speed-button"
             type="button"
             aria-label={`현재 ${speed}배속, 배속 변경`}
             onClick={() => {
-              setSpeed((prev) =>
-                prev === 1 ? 2 : 1,
-              );
+              setSpeed((prev) => (prev === 1 ? 2 : 1));
             }}
           >
             <span className="game-speed-button__icon">
@@ -298,7 +277,6 @@ export default function GamePage({
             <span>{speed}배속</span>
           </button>
 
-          {/* 메뉴 버튼 */}
           <button
             className="game-header__menu"
             type="button"
@@ -346,9 +324,7 @@ export default function GamePage({
               <div className="game-rewards__track">
                 <div
                   className="game-rewards__progress"
-                  style={{
-                    width: `${progress}%`,
-                  }}
+                  style={{ width: `${progress}%` }}
                 />
               </div>
             </div>
@@ -379,12 +355,10 @@ export default function GamePage({
               <img src={appleImage} alt="" />
 
               <strong>
-                {reward
-                  ? `${reward.piece_judgments}회`
-                  : '—'}
+                {reward?.mobs_defeated.toLocaleString() ?? '—'}
               </strong>
 
-              <small>조각 추첨</small>
+              <small>처치한 몬스터</small>
             </div>
 
             <button
@@ -407,31 +381,29 @@ export default function GamePage({
         </section>
 
         {/* Claim Result */}
-       
-{result && (
-  <RewardModal
-    gold={result.gained.gold}
-    exp={result.gained.exp}
-    pieces={result.gained.pieces.gained}
-    totalGold={result.gold}
-    currentExp={result.exp}
-    totalPieces={result.gained.pieces.total}
-    explorationSeconds={result.gained.elapsed_seconds}
-    specialtyName={result.gained.pieces.name}
-    onClose={() => {
-  setResult(null);
-  onOpenMap();
-}}
-onContinue={() => setResult(null)}
-  />
-)}
+        {result && (
+          <RewardModal
+            gold={result.gained.gold}
+            exp={result.gained.exp}
+            pieces={result.gained.pieces.gained}
+            totalGold={result.gold}
+            currentExp={result.exp}
+            totalPieces={result.gained.pieces.total}
+            explorationSeconds={result.gained.elapsed_seconds}
+            specialtyName={result.gained.pieces.name}
+            dropRateBp={result.gained.pieces.drop_rate_bp}
+            mobsDefeated={result.gained.mobs_defeated}
+            onClose={() => {
+              setResult(null);
+              onOpenMap();
+            }}
+            onContinue={() => setResult(null)}
+          />
+        )}
 
         {/* Notice */}
         {message && (
-          <div
-            className="game-notice"
-            role="status"
-          >
+          <div className="game-notice" role="status">
             {message}
 
             <button

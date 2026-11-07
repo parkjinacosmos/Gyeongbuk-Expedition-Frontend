@@ -12,14 +12,13 @@ interface RewardModalProps {
   gold: number;
   exp: number;
   pieces: number;
-
   totalGold: number;
   currentExp: number;
   totalPieces: number;
-
   explorationSeconds: number;
   specialtyName?: string;
-
+  dropRateBp: number;
+  mobsDefeated: number;
   onClose: () => void;
   onContinue: () => void;
 }
@@ -28,13 +27,8 @@ function formatDuration(seconds: number): string {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
 
-  if (hours > 0) {
-    return `${hours}시간 ${minutes}분`;
-  }
-
-  if (minutes > 0) {
-    return `${minutes}분`;
-  }
+  if (hours > 0) return `${hours}시간 ${minutes}분`;
+  if (minutes > 0) return `${minutes}분`;
 
   return `${Math.max(0, seconds)}초`;
 }
@@ -48,14 +42,14 @@ export default function RewardModal({
   totalPieces,
   explorationSeconds,
   specialtyName = '사과',
+  dropRateBp,
+  mobsDefeated,
   onClose,
   onContinue,
 }: RewardModalProps) {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        onClose();
-      }
+      if (event.key === 'Escape') onClose();
     };
 
     window.addEventListener('keydown', handleKeyDown);
@@ -80,9 +74,7 @@ export default function RewardModal({
         />
 
         <div className="reward-popup__heading">
-          <h2 id="reward-popup-title">
-            보상 수령 완료!
-          </h2>
+          <h2 id="reward-popup-title">보상 수령 완료!</h2>
         </div>
 
         <div className="reward-popup__content">
@@ -140,12 +132,15 @@ export default function RewardModal({
           </div>
 
           <div className="reward-popup__info">
-            <p>탐험 중 특산물 조각을 획득할 수 있어요.</p>
+            <p>
+              몬스터 {mobsDefeated.toLocaleString()}마리 처치!
+            </p>
             <strong>
-              지역마다 조각 획득 확률이 달라집니다.
+              {specialtyName} 조각 획득 확률{' '}
+              {(dropRateBp / 100).toFixed(2)}%
             </strong>
             <small>
-              정확한 획득 확률은 추후 적용됩니다.
+              300회 연속 실패 시 다음 처치에서 확정 획득
             </small>
           </div>
 

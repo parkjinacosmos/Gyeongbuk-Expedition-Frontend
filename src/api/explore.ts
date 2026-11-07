@@ -7,10 +7,8 @@ const USE_MOCK = import.meta.env.VITE_USE_MOCK_API !== 'false';
 
 const IDLE_CAP_SECONDS = 8 * 60 * 60;
 const MIN_CLAIM_SECONDS = 60;
-
-// ========================================
-// Types
-// ========================================
+const SECONDS_PER_MOB = 4;
+const GUARANTEED_AFTER_FAILS = 300;
 
 export type RegionStatus = 'CURRENT' | 'UNLOCKED' | 'LOCKED';
 
@@ -50,6 +48,7 @@ export interface ExploreRegion {
   gold_per_minute: number;
   exp_per_minute: number;
   description: string | null;
+  piece_drop_bp: number;
   specialty: {
     id: number;
     name: string;
@@ -72,6 +71,7 @@ export interface RewardPieces {
   specialty_id: number;
   name: string;
   judgments: number;
+  drop_rate_bp: number;
   gained: number;
   total: number;
   carry_seconds: number;
@@ -83,6 +83,7 @@ export interface SettledReward {
   capped: boolean;
   gold: number;
   exp: number;
+  mobs_defeated: number;
   pieces: RewardPieces;
   unlocked_regions: Array<{
     id: number;
@@ -112,6 +113,7 @@ export interface IdleRewardPreview {
   exp: number;
   level_after: number;
   piece_judgments: number;
+  mobs_defeated: number;
   server_time: string;
 }
 
@@ -126,10 +128,6 @@ export interface IdleRewardClaim {
   state_version: number;
   settled_at: string;
 }
-
-// ========================================
-// API Error
-// ========================================
 
 export class ApiError extends Error {
   status: number;
@@ -150,10 +148,6 @@ export class ApiError extends Error {
     this.details = details;
   }
 }
-
-// ========================================
-// HTTP Request
-// ========================================
 
 async function request<T>(
   path: string,
@@ -239,6 +233,7 @@ const mockRegions: ExploreRegion[] = [
     gold_per_minute: 5,
     exp_per_minute: 1,
     description: null,
+    piece_drop_bp: 60,
     specialty: {
       id: 1,
       name: '사과',
@@ -257,6 +252,7 @@ const mockRegions: ExploreRegion[] = [
     gold_per_minute: 8,
     exp_per_minute: 2,
     description: null,
+    piece_drop_bp: 55,
     specialty: {
       id: 2,
       name: '간고등어',
@@ -275,12 +271,14 @@ const mockRegions: ExploreRegion[] = [
   },
 ];
 
-// 동일 요청 키의 중복 수령을 방지하기 위한 Mock 저장소
+// 동일 요청 키 중복 수령 방지
 const mockClaimResults = new Map<string, IdleRewardClaim>();
 
-// ========================================
-// Mock Helpers
-// ========================================
+// 지역별 남은 시간과 연속 실패 횟수
+const mockMobStates = new Map<
+  number,
+  { carry: number; fails: number }
+>();
 
 function getMockRegion(): ExploreRegion | undefined {
   return mockRegions.find(
@@ -301,7 +299,6 @@ function calculateMockReward(): IdleRewardPreview {
   const cappedSeconds = Math.min(elapsed, IDLE_CAP_SECONDS);
 
   const region = getMockRegion();
-
   const goldPerMinute = region?.gold_per_minute ?? 0;
   const expPerMinute = region?.exp_per_minute ?? 0;
 
@@ -313,6 +310,13 @@ function calculateMockReward(): IdleRewardPreview {
 
   const exp = Math.floor(
     (cappedSeconds / 60) * expPerMinute,
+  );
+
+  const carry =
+    mockMobStates.get(region?.id ?? 0)?.carry ?? 0;
+
+  const mobsDefeated = Math.floor(
+    (cappedSeconds + carry) / SECONDS_PER_MOB,
   );
 
   return {
@@ -327,7 +331,8 @@ function calculateMockReward(): IdleRewardPreview {
     gold,
     exp,
     level_after: mockUser.level,
-    piece_judgments: Math.floor(cappedSeconds / 60),
+    piece_judgments: mobsDefeated,
+    mobs_defeated: mobsDefeated,
     server_time: new Date().toISOString(),
   };
 }
@@ -343,7 +348,6 @@ function applyMockExperience(
   let exp = mockUser.exp + gainedExp;
   let expToNextLevel = mockUser.exp_to_next_level;
 
-  // 화면 테스트용 단순 레벨업 규칙
   while (expToNextLevel > 0 && exp >= expToNextLevel) {
     exp -= expToNextLevel;
     level += 1;
@@ -374,8 +378,43 @@ function settleMockReward(
   const experience = applyMockExperience(preview.exp);
   const region = getMockRegion();
 
-  // 조각 확률은 실제 서버에서 처리하므로 Mock에서는 0개로 고정
-  const gainedPieces = 0;
+  const regionId = region?.id ?? 1;
+
+  const mobState = mockMobStates.get(regionId) ?? {
+    carry: 0,
+    fails: 0,
+  };
+
+  const mobsDefeated = preview.mobs_defeated;
+
+  const nextCarry =
+    (preview.elapsed_seconds + mobState.carry) %
+    SECONDS_PER_MOB;
+
+  let gainedPieces = 0;
+  let consecutiveFails = mobState.fails;
+
+  const dropRate = region?.piece_drop_bp ?? 60;
+
+  // 몬스터 1마리마다 특산물 조각 드롭 판정
+  for (let i = 0; i < mobsDefeated; i += 1) {
+    const success =
+      consecutiveFails >= GUARANTEED_AFTER_FAILS ||
+      Math.floor(Math.random() * 10000) < dropRate;
+
+    if (success) {
+      gainedPieces += 1;
+      consecutiveFails = 0;
+    } else {
+      consecutiveFails += 1;
+    }
+  }
+
+  mockMobStates.set(regionId, {
+    carry: nextCarry,
+    fails: consecutiveFails,
+  });
+
   const settledAt = new Date().toISOString();
 
   if (region) {
@@ -406,15 +445,17 @@ function settleMockReward(
       capped: preview.capped,
       gold: preview.gold,
       exp: preview.exp,
+      mobs_defeated: mobsDefeated,
       pieces: {
-        region_id: region?.id ?? 1,
+        region_id: regionId,
         specialty_id: region?.specialty.id ?? 1,
         name: region?.specialty.name ?? '사과',
-        judgments: preview.piece_judgments,
+        judgments: mobsDefeated,
+        drop_rate_bp: dropRate,
         gained: gainedPieces,
         total: region?.specialty.pieces ?? 0,
-        carry_seconds: 0,
-        consecutive_fails: 0,
+        carry_seconds: nextCarry,
+        consecutive_fails: consecutiveFails,
       },
       unlocked_regions: [],
     },
@@ -458,7 +499,8 @@ const mockApi = {
   async claimIdleReward(
     idempotencyKey: string,
   ): Promise<IdleRewardClaim> {
-    const previousResult = mockClaimResults.get(idempotencyKey);
+    const previousResult =
+      mockClaimResults.get(idempotencyKey);
 
     if (previousResult) {
       return structuredClone(previousResult);
@@ -478,7 +520,6 @@ const mockApi = {
     targetRegionId: number,
     idempotencyKey: string,
   ): Promise<MoveRegionResponse> {
-    // 현재 Mock에서는 지역 이동 요청의 중복 키를 사용하지 않음
     void idempotencyKey;
 
     const target = mockRegions.find(
@@ -501,9 +542,11 @@ const mockApi = {
       );
     }
 
-    const previousRegion = structuredClone(mockUser.cur_region);
+    const previousRegion = structuredClone(
+      mockUser.cur_region,
+    );
 
-    // 지역 변경 전에 기존 지역의 누적 보상 정산
+    // 지역 변경 전 기존 지역 보상 정산
     const settlement = settleMockReward(false);
     const startedAt = settlement.settled_at;
 
