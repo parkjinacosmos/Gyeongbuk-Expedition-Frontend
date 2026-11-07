@@ -60,8 +60,6 @@ export default function BottomNavigation({
           </button>
         ))}
       </div>
-
-      <div className="bottom-navigation__indicator" />
     </nav>
   );
 }
