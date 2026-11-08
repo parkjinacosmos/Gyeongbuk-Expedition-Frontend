@@ -23,6 +23,7 @@ import './GamePage.css';
 
 interface GamePageProps {
   onOpenMap: () => void;
+  onOpenQuiz: () => void;
 }
 
 const MAX_SECONDS = 8 * 60 * 60;
@@ -47,6 +48,7 @@ function errorText(error: unknown): string {
 
 export default function GamePage({
   onOpenMap,
+  onOpenQuiz,
 }: GamePageProps) {
   const [user, setUser] =
     useState<ExploreUser | null>(null);
@@ -422,15 +424,11 @@ export default function GamePage({
       {/* Game Menu */}
       {menuOpen && (
         <GameMenu
-          onClose={() => {
-            setMenuOpen(false);
-          }}
-          onOpenMap={() => {
-            setMenuOpen(false);
-            onOpenMap();
-          }}
-          onNotice={setMessage}
-        />
+  onClose={() => setMenuOpen(false)}
+  onOpenMap={onOpenMap}
+  onOpenQuiz={onOpenQuiz}
+  onNotice={setMessage}
+/>
       )}
     </main>
   );

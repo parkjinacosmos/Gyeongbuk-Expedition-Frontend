@@ -21,6 +21,7 @@ interface RegionInfoPageProps {
   regionId: number;
   onBack: () => void;
   onStartExplore: () => void;
+  onOpenQuiz: () => void;
 }
 
 const regionDesigns = {
@@ -48,6 +49,7 @@ export default function RegionInfoPage({
   regionId,
   onBack,
   onStartExplore,
+  onOpenQuiz,
 }: RegionInfoPageProps) {
   const [selectedRegionId, setSelectedRegionId] =
     useState(regionId);
@@ -349,7 +351,7 @@ export default function RegionInfoPage({
               src="/game/character.png"
               alt="경북 원정대 사자 캐릭터"
               />
-              
+
               <img
                 className="region-info-illustration__mackerel"
                 src={
@@ -546,6 +548,7 @@ export default function RegionInfoPage({
             onBack();
           }}
           onNotice={setMessage}
+          onOpenQuiz={onOpenQuiz}
         />
       )}
     </main>

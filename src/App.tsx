@@ -4,16 +4,19 @@ import { useEffect, useState } from 'react';
 import ExplorePage from './pages/Explore/ExplorePage';
 import GamePage from './pages/Game/GamePage';
 import RegionInfoPage from './pages/RegionInfo/RegionInfoPage';
+import QuizPage from './pages/Quiz/QuizPage';
 
 import BottomNavigation from './components/BottomNavigation/BottomNavigation';
 
 import type { NavigationItem } from './components/BottomNavigation/BottomNavigation';
 
-type ExploreScreen = 'map' | 'region-info' | 'game';
+type ExploreScreen = 'map' | 'region-info' | 'game' | 'quiz';
+type QuizReturnScreen = Exclude<ExploreScreen, 'quiz'>;
 
 const ACTIVE_TAB_KEY = 'gyeongbuk-active-tab';
 const EXPLORE_SCREEN_KEY = 'gyeongbuk-explore-screen';
 const REGION_ID_KEY = 'gyeongbuk-selected-region';
+const QUIZ_RETURN_KEY = 'gyeongbuk-quiz-return-screen';
 
 const pageTitles: Record<
   Exclude<NavigationItem, 'explore'>,
@@ -45,14 +48,13 @@ function getSavedTab(): NavigationItem {
 
 function getSavedExploreScreen(): ExploreScreen {
   try {
-    const saved = localStorage.getItem(
-      EXPLORE_SCREEN_KEY,
-    );
+    const saved = localStorage.getItem(EXPLORE_SCREEN_KEY);
 
     if (
       saved === 'map' ||
+      saved === 'region-info' ||
       saved === 'game' ||
-      saved === 'region-info'
+      saved === 'quiz'
     ) {
       return saved;
     }
@@ -65,14 +67,29 @@ function getSavedExploreScreen(): ExploreScreen {
 
 function getSavedRegionId(): number {
   try {
-    const saved = Number(
-      localStorage.getItem(REGION_ID_KEY),
-    );
-
+    const saved = Number(localStorage.getItem(REGION_ID_KEY));
     return saved === 1 || saved === 2 ? saved : 2;
   } catch {
     return 2;
   }
+}
+
+function getSavedQuizReturn(): QuizReturnScreen {
+  try {
+    const saved = localStorage.getItem(QUIZ_RETURN_KEY);
+
+    if (
+      saved === 'map' ||
+      saved === 'region-info' ||
+      saved === 'game'
+    ) {
+      return saved;
+    }
+  } catch {
+    // 저장소 사용 불가
+  }
+
+  return 'game';
 }
 
 export default function App() {
@@ -84,6 +101,9 @@ export default function App() {
 
   const [selectedRegionId, setSelectedRegionId] =
     useState(getSavedRegionId);
+
+  const [quizReturnScreen, setQuizReturnScreen] =
+    useState<QuizReturnScreen>(getSavedQuizReturn);
 
   useEffect(() => {
     try {
@@ -115,6 +135,17 @@ export default function App() {
     }
   }, [selectedRegionId]);
 
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        QUIZ_RETURN_KEY,
+        quizReturnScreen,
+      );
+    } catch {
+      // 저장 실패 시에도 정상 동작
+    }
+  }, [quizReturnScreen]);
+
   const openMap = () => {
     setActiveTab('explore');
     setExploreScreen('map');
@@ -125,11 +156,22 @@ export default function App() {
     setExploreScreen('game');
   };
 
-  const openRegionInfo = (regionId: number) => {
-    // MVP에서는 R01, R02만 표시
-    if (regionId !== 1 && regionId !== 2) {
-      return;
+  const openQuiz = () => {
+    if (exploreScreen !== 'quiz') {
+      setQuizReturnScreen(exploreScreen);
     }
+
+    setActiveTab('explore');
+    setExploreScreen('quiz');
+  };
+
+  const closeQuiz = () => {
+    setActiveTab('explore');
+    setExploreScreen(quizReturnScreen);
+  };
+
+  const openRegionInfo = (regionId: number) => {
+    if (regionId !== 1 && regionId !== 2) return;
 
     setSelectedRegionId(regionId);
     setActiveTab('explore');
@@ -147,15 +189,25 @@ export default function App() {
           <ExplorePage
             onStartExplore={openGame}
             onOpenRegionInfo={openRegionInfo}
+            onOpenQuiz={openQuiz}
           />
         ) : exploreScreen === 'region-info' ? (
           <RegionInfoPage
             regionId={selectedRegionId}
             onBack={openMap}
             onStartExplore={openGame}
+            onOpenQuiz={openQuiz}
+          />
+        ) : exploreScreen === 'quiz' ? (
+          <QuizPage
+            onOpenMap={openMap}
+            onBack={closeQuiz}
           />
         ) : (
-          <GamePage onOpenMap={openMap} />
+          <GamePage
+            onOpenMap={openMap}
+            onOpenQuiz={openQuiz}
+          />
         )
       ) : (
         <main

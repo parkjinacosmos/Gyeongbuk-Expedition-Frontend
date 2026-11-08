@@ -8,12 +8,14 @@ import settingsIcon from '../../assets/explore/settings.png';
 interface GameMenuProps {
   onClose: () => void;
   onOpenMap: () => void;
+  onOpenQuiz: () => void;
   onNotice: (message: string) => void;
 }
 
 export default function GameMenu({
   onClose,
   onOpenMap,
+  onOpenQuiz,
   onNotice,
 }: GameMenuProps) {
   const handleNotice = (message: string) => {
@@ -33,9 +35,10 @@ export default function GameMenu({
       <nav className="game-menu" aria-label="탐험 메뉴">
         <button
           type="button"
-          onClick={() =>
-            handleNotice('지역 퀴즈는 준비 중이에요.')
-          }
+          onClick={() => {
+            onClose();
+            onOpenQuiz();
+          }}
         >
           <span className="game-menu__content">
             <img

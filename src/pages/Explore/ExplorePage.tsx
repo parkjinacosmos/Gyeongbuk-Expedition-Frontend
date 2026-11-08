@@ -30,6 +30,7 @@ import './ExplorePage.css';
 interface ExplorePageProps {
   onStartExplore: () => void;
   onOpenRegionInfo: (regionId: number) => void;
+  onOpenQuiz: () => void;
 }
 
 interface RegionDesign {
@@ -123,6 +124,7 @@ function getErrorMessage(error: unknown): string {
 export default function ExplorePage({
   onStartExplore,
   onOpenRegionInfo,
+  onOpenQuiz,
 }: ExplorePageProps) {
   const [user, setUser] =
     useState<ExploreUser | null>(null);
@@ -572,6 +574,7 @@ export default function ExplorePage({
             setMenuOpen(false)
           }
           onNotice={setNotice}
+          onOpenQuiz={onOpenQuiz}
         />
       )}
     </main>
