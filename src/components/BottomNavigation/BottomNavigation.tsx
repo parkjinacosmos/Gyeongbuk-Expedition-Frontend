@@ -3,7 +3,11 @@ import { useState } from 'react';
 import './BottomNavigation.css';
 import navigationIcons from '../../assets/navigation-icons.png';
 
-type NavigationItem = 'explore' | 'character' | 'book' | 'shop';
+export type NavigationItem =
+  | 'explore'
+  | 'character'
+  | 'book'
+  | 'shop';
 
 interface BottomNavigationProps {
   activeTab?: NavigationItem;

@@ -1,0 +1,270 @@
+.reward-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(30, 33, 20, 0.42);
+  backdrop-filter: blur(2px);
+}
+
+.reward-popup {
+  position: relative;
+  width: 100%;
+  max-width: 310px;
+  padding: 0 10px 12px;
+  border: 2px solid #9c7847;
+  border-radius: 16px;
+  background: #fff5dc;
+  box-shadow:
+    0 7px 0 rgba(91, 67, 40, 0.38),
+    0 12px 22px rgba(0, 0, 0, 0.22);
+  color: #57391e;
+  animation: reward-popup-enter 0.2s ease-out;
+}
+
+.reward-popup__treasure {
+  position: absolute;
+  top: -65px;
+  left: 50%;
+  width: 90px;
+  height: 70px;
+  object-fit: contain;
+  transform: translateX(-50%);
+  z-index: -1;
+}
+
+.reward-popup__heading {
+  position: relative;
+  z-index: 1;
+  width: 93%; 
+  margin: -12px auto 10px;
+  padding: 9px 8px;
+  border: 2px solid #c18c3d;
+  border-radius: 14px;
+  background: linear-gradient(#ffe4a0, #f6c86f);
+  text-align: center;
+}
+
+.reward-popup__heading h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 900;
+  color: #58391c;
+}
+
+.reward-popup__content {
+  padding: 0 2px;
+}
+
+.reward-popup__exploration {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0 12px;
+}
+
+.reward-popup__character {
+  display: grid;
+  width: 52px;
+  height: 45px;
+  place-items: center;
+  font-size: 34px;
+}
+
+.reward-popup__exploration strong {
+  display: block;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.reward-popup__exploration p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #8d7357;
+}
+
+.reward-popup__items {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.reward-popup__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 33px;
+  padding: 5px 10px;
+  border: 1px solid #e6c89a;
+  border-radius: 18px;
+  background: #fff0d2;
+}
+
+.reward-popup__item > span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.reward-popup__item > strong {
+  font-size: 16px;
+  font-weight: 900;
+  color: #3d9b37;
+}
+
+.reward-popup__coin,
+.reward-popup__exp {
+  display: inline-grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  border-radius: 50%;
+  color: white;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.reward-popup__coin {
+  background: #f4b32d;
+}
+
+.reward-popup__exp {
+  background: #48a9ec;
+  font-size: 7px;
+}
+
+.reward-popup__apple {
+  font-size: 18px;
+}
+
+.reward-popup__info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: 11px;
+  padding: 10px 5px;
+  border: 1px solid #e8c893;
+  border-radius: 10px;
+  background: #fff0d1;
+  text-align: center;
+}
+
+.reward-popup__info p {
+  margin: 0;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.reward-popup__info strong {
+  font-size: 9px;
+  font-weight: 900;
+  color: #42923b;
+}
+
+.reward-popup__info small {
+  font-size: 8px;
+  color: #977f5f;
+}
+
+.reward-popup__totals {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  margin: 13px 0 16px;
+  text-align: center;
+}
+
+.reward-popup__totals > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.reward-popup__totals span {
+  font-size: 11px;
+  color: #987e5d;
+}
+
+.reward-popup__totals strong {
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.reward-popup__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.reward-popup__button {
+  height: 39px;
+  border-radius: 11px;
+  font-size: 15px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.reward-popup__button--confirm {
+  border: 2px solid #387d2a;
+  background: linear-gradient(#86d565, #369a32);
+  color: white;
+}
+
+.reward-popup__button--continue {
+  border: 2px solid #bd9361;
+  background: linear-gradient(#fff9e9, #ffebca);
+  color: #69472a;
+}
+
+.reward-popup__button:active {
+  transform: scale(0.98);
+}
+
+@keyframes reward-popup-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.reward-popup__character {
+  display: block;
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+/* 기존 게임 보상 아이콘 재사용 */
+.reward-popup__item-icon {
+  display: block;
+  width: 21px;
+  height: 21px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+/* 탐험 시간 영역 */
+.reward-popup__exploration {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0 12px;
+}
+
+/* 보상 항목 정렬 */
+.reward-popup__item > span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}

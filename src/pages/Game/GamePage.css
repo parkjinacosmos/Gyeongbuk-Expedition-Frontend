@@ -1,0 +1,581 @@
+
+/* ========================================
+   Game Page
+======================================== */
+
+.game-page {
+  width: 100%;
+  min-height: 100dvh;
+  margin: 0;
+  padding: 0;
+  background: #9ccf80;
+  color: #54371f;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.game-page,
+.game-page * {
+  box-sizing: border-box;
+}
+
+.game-page__container {
+  position: relative;
+  width: 100%;
+  max-width: 390px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding-bottom: 115px;
+  overflow: hidden;
+
+  background-color: #b9dca0;
+  background-image: url('/game/background.png');
+  background-repeat: no-repeat;
+  background-position: center top;
+  background-size: 100% auto;
+}
+
+/* ========================================
+   Header
+======================================== */
+
+.game-header {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  height: 156px;
+}
+
+/* Profile */
+
+.game-header__profile {
+  position: absolute;
+  top: 45px;
+  left: 12px;
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.game-header__profile > img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+
+.game-header__profile > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.game-header__profile strong {
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.game-header__profile span {
+  max-width: 76px;
+  overflow: hidden;
+  font-size: 10px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Region */
+
+.game-header__region {
+  position: absolute;
+  top: 31px;
+  left: 50%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+
+  width: 158px;
+  text-align: center;
+  transform: translateX(-50%);
+}
+
+.game-header__region > span {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.game-header__region > strong {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+
+  font-size: 16px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.game-header__region > strong img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.game-header__region > small {
+  display: none;
+}
+
+/* Gold */
+
+.game-header__gold {
+  position: absolute;
+  top: 48px;
+  right: 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.game-header__gold img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+.game-header__gold strong {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+/* ========================================
+   Header Controls
+======================================== */
+
+/* 배속 버튼 - 메뉴 바로 왼쪽 */
+
+.game-header .game-speed-button {
+  position: absolute;
+  top: 93px;
+  right: 62px;
+  left: auto;
+  z-index: 20;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+
+  min-width: 76px;
+  height: 34px;
+  padding: 0 10px;
+
+  border: 2px solid #8b6235;
+  border-radius: 18px;
+
+  background: #fff4d7;
+  color: #654321;
+
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.game-speed-button__icon {
+  font-size: 13px;
+  line-height: 1;
+}
+
+.game-speed-button:active {
+  transform: scale(0.96);
+}
+
+/* Menu Button */
+
+.game-header__menu {
+  position: absolute;
+  top: 90px;
+  right: 12px;
+  z-index: 21;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 40px;
+  height: 40px;
+  padding: 0;
+
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.game-header__menu img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* ========================================
+   Game Scene
+======================================== */
+
+.game-scene {
+  position: relative;
+  width: 100%;
+  height: 410px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: transparent;
+}
+
+.game-scene > .runner-game {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.game-scene .runner-game__scene {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+/* ========================================
+   Idle Reward
+======================================== */
+
+.game-rewards {
+  position: relative;
+  z-index: 5;
+
+  width: calc(100% - 32px);
+  margin: 12px 16px 0;
+  padding: 14px 14px 15px;
+
+  border: 2px solid #9c713b;
+  border-radius: 19px;
+
+  background: linear-gradient(
+    180deg,
+    #fffbe8 0%,
+    #ffecc7 100%
+  );
+
+  box-shadow: 0 5px 0 rgb(112 76 38 / 18%);
+}
+
+.game-rewards__top {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.game-rewards__top h2 {
+  margin: 0;
+  color: #5b3a21;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.game-rewards__time {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.game-rewards__time > span {
+  color: #725136;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.game-rewards__track {
+  width: 100%;
+  height: 11px;
+  overflow: hidden;
+
+  border: 1px solid #b78b51;
+  border-radius: 999px;
+  background: #e4d4ae;
+}
+
+.game-rewards__progress {
+  height: 100%;
+  border-radius: inherit;
+
+  background: linear-gradient(
+    90deg,
+    #8cbd4c,
+    #c2e36b
+  );
+
+  transition: width 0.4s ease;
+}
+
+.game-rewards__bottom {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.game-rewards__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.game-rewards__item img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.game-rewards__item strong {
+  color: #5b3a21;
+  font-size: 15px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+.game-rewards__item small {
+  color: #806143;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* Claim Button */
+
+.game-rewards__claim {
+  grid-column: 1 / -1;
+
+  width: 100%;
+  height: 42px;
+  margin-top: 8px;
+
+  border: 2px solid #8a5c2b;
+  border-radius: 13px;
+
+  background: linear-gradient(
+    180deg,
+    #f6c45c,
+    #e6a63e
+  );
+
+  color: #583515;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.game-rewards__claim:disabled {
+  border-color: #a99b83;
+  background: #d9d0bd;
+  color: #8b806e;
+  cursor: not-allowed;
+}
+
+.game-rewards__claim:not(:disabled):active {
+  transform: translateY(2px);
+}
+
+/* ========================================
+   Notice
+======================================== */
+
+.game-notice {
+  position: relative;
+  z-index: 15;
+
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  width: calc(100% - 32px);
+  margin: 12px 16px 0;
+  padding: 12px 35px 12px 14px;
+
+  border: 2px solid #b78b51;
+  border-radius: 12px;
+
+  background: #fff8e5;
+  color: #654321;
+
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.game-notice strong {
+  font-size: 14px;
+}
+
+.game-notice button {
+  position: absolute;
+  top: 7px;
+  right: 9px;
+
+  border: 0;
+  background: transparent;
+
+  color: #654321;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* ========================================
+   Responsive
+======================================== */
+
+@media (max-width: 360px) {
+  .game-header__profile {
+    left: 8px;
+  }
+
+  .game-header__profile > img {
+    width: 36px;
+    height: 36px;
+  }
+
+  .game-header__region {
+    width: 140px;
+  }
+
+  .game-header__region > strong {
+    font-size: 14px;
+  }
+
+  .game-header__gold {
+    right: 9px;
+  }
+
+  .game-header__gold strong {
+    font-size: 11px;
+  }
+
+  .game-header .game-speed-button {
+    right: 57px;
+    min-width: 70px;
+    padding: 0 8px;
+  }
+
+  .game-rewards {
+    width: calc(100% - 24px);
+    margin-right: 12px;
+    margin-left: 12px;
+  }
+}
+
+/* 쌓인 보상 카드 크기 축소 */
+
+.game-rewards {
+  margin-top: 4px;
+  padding: 10px 12px 11px;
+  border-radius: 15px;
+}
+
+.game-rewards__top {
+  gap: 5px;
+}
+
+.game-rewards__top h2 {
+  font-size: 14px;
+}
+
+.game-rewards__time {
+  gap: 4px;
+}
+
+.game-rewards__track {
+  height: 8px;
+}
+
+.game-rewards__bottom {
+  gap: 5px;
+  margin-top: 9px;
+}
+
+.game-rewards__item {
+  gap: 3px;
+}
+
+.game-rewards__item img {
+  width: 27px;
+  height: 27px;
+}
+
+.game-rewards__item strong {
+  font-size: 13px;
+}
+
+.game-rewards__item small {
+  font-size: 9px;
+}
+
+.game-rewards__claim {
+  height: 35px;
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+/* 쌓인 보상 헤더 */
+.game-rewards__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+}
+
+/* 보물상자 + 제목 */
+.game-rewards__title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+}
+
+.game-rewards__title h2 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.game-rewards__treasure {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+/* 오른쪽 시간 표시 + 진행 바 */
+.game-rewards__timer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  width: 115px;
+  flex-shrink: 0;
+}
+
+.game-rewards__timer .game-rewards__time {
+  width: 100%;
+  justify-content: flex-end;
+  font-size: 11px;
+}
+
+.game-rewards__timer .game-rewards__track {
+  width: 100%;
+  height: 7px;
+  margin: 0;
+  border-radius: 999px;
+}
