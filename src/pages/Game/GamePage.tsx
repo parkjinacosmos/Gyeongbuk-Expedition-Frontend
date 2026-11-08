@@ -8,6 +8,7 @@ import {
   type IdleRewardClaim,
 } from '../../api/explore';
 
+import GameHeader from '../../components/GameHeader/GameHeader';
 import GameScene from '../../components/GameScene/GameScene';
 import GameMenu from '../../components/GameMenu/GameMenu';
 import RewardModal from '../../components/RewardModal/RewardModal';
@@ -15,8 +16,6 @@ import RewardModal from '../../components/RewardModal/RewardModal';
 import appleImage from '../../assets/explore/apple.png';
 import mackerelImage from '../../assets/explore/mackerel.png';
 import goldImage from '../../assets/explore/gold.png';
-import profileImage from '../../assets/explore/profile.png';
-import menuImage from '../../assets/explore/menu.png';
 import treasureIcon from '../../assets/explore/treasure.png';
 
 import './GamePage.css';
@@ -53,6 +52,7 @@ export default function GamePage({
 }: GamePageProps) {
   const [user, setUser] = useState<ExploreUser | null>(null);
   const [regions, setRegions] = useState<ExploreRegion[]>([]);
+
   const [reward, setReward] =
     useState<IdleRewardPreview | null>(null);
 
@@ -230,7 +230,6 @@ export default function GamePage({
     (seconds / capSeconds) * 100,
   );
 
-  // 서버가 수령 가능 여부를 최종 판단
   const canClaim =
     !!user &&
     !!reward &&
@@ -257,7 +256,6 @@ export default function GamePage({
     try {
       const claim = await exploreApi.claimIdleReward(key);
 
-      // 보상 수령 성공 후 이전 미리보기 요청 무효화
       requestVersion.current += 1;
       pendingKey.current = null;
 
@@ -296,42 +294,33 @@ export default function GamePage({
   return (
     <main className="game-page">
       <div className="game-page__container">
-        {/* Header */}
-        <header className="game-header">
-          <div className="game-header__profile">
-            <img src={profileImage} alt="" />
-
-            <div>
-              <strong>Lv.{user?.level ?? '—'}</strong>
-              <span>{user?.name ?? '원정대원'}</span>
-            </div>
-          </div>
-
-          <div className="game-header__region">
-            <span>
-              현재 지역 {user?.cur_region.code ?? '—'}
-            </span>
-
-            <strong>
-              <img src={currentRegionImage} alt="" />
-              {user?.cur_region.name ?? '불러오는 중'}
-            </strong>
-          </div>
-
-          <div className="game-header__gold">
-            <img src={goldImage} alt="" />
-
-            <strong>
-              {user?.gold.toLocaleString() ?? '—'}
-            </strong>
-          </div>
-
+        {/* 공통 헤더 */}
+        <GameHeader
+          variant="game"
+          user={user}
+          regionImage={currentRegionImage}
+          regionName={
+            user?.cur_region.name ?? '불러오는 중'
+          }
+          menuOpen={menuOpen}
+          onOpenMenu={() =>
+            setMenuOpen((prev) => !prev)
+          }
+          onAddGold={() =>
+            setMessage(
+              '골드 충전 기능은 준비 중이에요.',
+            )
+          }
+        >
+          {/* 게임 화면 전용 배속 버튼 */}
           <button
             className="game-speed-button"
             type="button"
             aria-label={`현재 ${speed}배속, 배속 변경`}
             onClick={() =>
-              setSpeed((prev) => (prev === 1 ? 2 : 1))
+              setSpeed((prev) =>
+                prev === 1 ? 2 : 1,
+              )
             }
           >
             <span className="game-speed-button__icon">
@@ -339,19 +328,7 @@ export default function GamePage({
             </span>
             <span>{speed}배속</span>
           </button>
-
-          <button
-            className="game-header__menu"
-            type="button"
-            aria-label="메뉴"
-            aria-expanded={menuOpen}
-            onClick={() =>
-              setMenuOpen((prev) => !prev)
-            }
-          >
-            <img src={menuImage} alt="" />
-          </button>
-        </header>
+        </GameHeader>
 
         {/* Game Scene */}
         <section
@@ -359,11 +336,11 @@ export default function GamePage({
           aria-label="자동 탐험 게임"
         >
           <GameScene
-  speed={speed}
-  collectedPieces={pieces}
-  regionId={user?.cur_region.id ?? 1}
-  specialtyName={currentRegion?.specialty.name}
-/>
+            speed={speed}
+            collectedPieces={pieces}
+            regionId={user?.cur_region.id ?? 1}
+            specialtyName={currentRegion?.specialty.name}
+          />
         </section>
 
         {/* Idle Reward */}
@@ -446,10 +423,18 @@ export default function GamePage({
             totalGold={result.gold}
             currentExp={result.exp}
             totalPieces={result.gained.pieces.total}
-            explorationSeconds={result.gained.elapsed_seconds}
-            specialtyName={result.gained.pieces.name}
-            dropRateBp={result.gained.pieces.drop_rate_bp}
-            mobsDefeated={result.gained.mobs_defeated}
+            explorationSeconds={
+              result.gained.elapsed_seconds
+            }
+            specialtyName={
+              result.gained.pieces.name
+            }
+            dropRateBp={
+              result.gained.pieces.drop_rate_bp
+            }
+            mobsDefeated={
+              result.gained.mobs_defeated
+            }
             onClose={() => {
               setResult(null);
               onOpenMap();
@@ -460,7 +445,10 @@ export default function GamePage({
 
         {/* Notice */}
         {message && (
-          <div className="game-notice" role="status">
+          <div
+            className="game-notice"
+            role="status"
+          >
             {message}
 
             <button
