@@ -6,6 +6,7 @@ import {
   type ExploreUser,
 } from '../../api/explore';
 
+import GameHeader from '../../components/GameHeader/GameHeader';
 import GameMenu from '../../components/GameMenu/GameMenu';
 
 import appleImage from '../../assets/explore/apple.png';
@@ -17,19 +18,11 @@ import melonImage from '../../assets/explore/melon.png';
 import garlicImage from '../../assets/explore/garlic.png';
 import gwamegiImage from '../../assets/explore/gwamegi.png';
 
-import goldImage from '../../assets/explore/gold.png';
 import lockImage from '../../assets/explore/lock.png';
 import mapBackground from '../../assets/explore/map-background.png';
 import mapIcon from '../../assets/explore/map-icon.png';
-import menuImage from '../../assets/explore/menu.png';
-import plusImage from '../../assets/explore/plus.png';
-import profileImage from '../../assets/explore/profile.png';
 
 import './ExplorePage.css';
-
-// ========================================
-// Types
-// ========================================
 
 interface ExplorePageProps {
   onStartExplore: () => void;
@@ -51,10 +44,6 @@ interface DisplayRegion extends RegionDesign {
   status: 'current' | 'unlocked' | 'locked';
   requirement: string;
 }
-
-// ========================================
-// Region Design Data
-// ========================================
 
 const regionDesigns: RegionDesign[] = [
   {
@@ -123,10 +112,6 @@ const regionDesigns: RegionDesign[] = [
   },
 ];
 
-// ========================================
-// Helpers
-// ========================================
-
 function getErrorMessage(error: unknown): string {
   return error instanceof Error
     ? error.message
@@ -137,14 +122,8 @@ function getRegionStatus(
   region: ExploreRegion | null,
   isCurrent: boolean,
 ): DisplayRegion['status'] {
-  if (isCurrent) {
-    return 'current';
-  }
-
-  if (region?.status === 'UNLOCKED') {
-    return 'unlocked';
-  }
-
+  if (isCurrent) return 'current';
+  if (region?.status === 'UNLOCKED') return 'unlocked';
   return 'locked';
 }
 
@@ -152,17 +131,9 @@ function getRegionRequirement(
   region: ExploreRegion | null,
   status: DisplayRegion['status'],
 ): string {
-  if (status === 'current') {
-    return '현재 지역';
-  }
-
-  if (!region) {
-    return '준비 중인 지역';
-  }
-
-  if (status === 'unlocked') {
-    return '해금 완료';
-  }
+  if (status === 'current') return '현재 지역';
+  if (!region) return '준비 중인 지역';
+  if (status === 'unlocked') return '해금 완료';
 
   if (region.unlock) {
     const {
@@ -180,10 +151,6 @@ function getRegionRequirement(
   return '잠긴 지역';
 }
 
-// ========================================
-// Explore Page
-// ========================================
-
 export default function ExplorePage({
   onStartExplore,
   onOpenRegionInfo,
@@ -195,16 +162,10 @@ export default function ExplorePage({
   const [apiRegions, setApiRegions] =
     useState<ExploreRegion[]>([]);
 
-  const [selectedId, setSelectedId] =
-    useState<number>(1);
-
+  const [selectedId, setSelectedId] = useState(1);
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
-
-  // ========================================
-  // Load API Data
-  // ========================================
 
   useEffect(() => {
     let cancelled = false;
@@ -241,9 +202,7 @@ export default function ExplorePage({
           `탐험 정보를 불러오지 못했어요. ${getErrorMessage(error)}`,
         );
       } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
+        if (!cancelled) setLoading(false);
       }
     }
 
@@ -253,10 +212,6 @@ export default function ExplorePage({
       cancelled = true;
     };
   }, []);
-
-  // ========================================
-  // Region Data Mapping
-  // ========================================
 
   const regionMap = useMemo(
     () =>
@@ -314,19 +269,13 @@ export default function ExplorePage({
   const isLocked =
     selectedRegion.status === 'locked';
 
-  // ========================================
-  // Region Navigation
-  // ========================================
-
   function handleRegionSelect() {
     if (loading || !user) return;
 
     const regionId = selectedRegion.id;
 
     if (!selectedRegion.apiData) {
-      setNotice(
-        '아직 탐험할 수 없는 지역이에요.',
-      );
+      setNotice('아직 탐험할 수 없는 지역이에요.');
       return;
     }
 
@@ -340,110 +289,38 @@ export default function ExplorePage({
     onOpenRegionInfo(regionId);
   }
 
-  // ========================================
-  // Render
-  // ========================================
-
   return (
     <main className="explore-page">
       <div className="explore-page__content">
-        {/* Background */}
         <img
           className="explore-page__background"
           src={mapBackground}
           alt=""
         />
 
-        {/* Header */}
-        <header className="explore-header">
-          <div className="explore-header__profile">
-            <img src={profileImage} alt="" />
+        <GameHeader
+          user={user}
+          variant="explore"
+          regionImage={currentRegion.image}
+          regionName={currentRegion.name}
+          specialtyName={currentRegion.product}
+          menuOpen={menuOpen}
+          onOpenMenu={() =>
+            setMenuOpen((prev) => !prev)
+          }
+          onAddGold={() =>
+            setNotice(
+              '골드 충전 기능은 준비 중이에요.',
+            )
+          }
+        />
 
-            <div>
-              <strong>
-                Lv.{user?.level ?? 1}
-              </strong>
-
-              <span>새싹 원정대원</span>
-            </div>
-          </div>
-
-          <div className="explore-header__location">
-            <span>
-              현재 지역{' '}
-              {user?.cur_region.code ?? 'R01'}
-            </span>
-
-            <strong>
-              <img
-                src={currentRegion.image}
-                alt=""
-              />
-
-              {currentRegion.name}{' '}
-              {currentRegion.product}
-            </strong>
-
-            <small>
-              경북 원정대 탐험 중
-            </small>
-          </div>
-
-          <div className="explore-header__gold">
-            <img
-              src={goldImage}
-              alt=""
-            />
-
-            <strong>
-              {(user?.gold ?? 0).toLocaleString()}
-            </strong>
-
-            <button
-              type="button"
-              aria-label="골드 추가"
-              onClick={() =>
-                setNotice(
-                  '골드 충전 기능은 준비 중이에요.',
-                )
-              }
-            >
-              <img
-                src={plusImage}
-                alt=""
-              />
-            </button>
-          </div>
-
-          <button
-            type="button"
-            className="explore-header__menu"
-            aria-label="메뉴 열기"
-            aria-expanded={menuOpen}
-            onClick={() =>
-              setMenuOpen((prev) => !prev)
-            }
-          >
-            <img
-              src={menuImage}
-              alt=""
-            />
-          </button>
-        </header>
-
-        {/* Map Title */}
         <div className="explore-title">
           <div className="explore-title__inner" />
-
-          <img
-            src={mapIcon}
-            alt=""
-          />
-
+          <img src={mapIcon} alt="" />
           <h1>탐험 지도</h1>
         </div>
 
-        {/* Region Map */}
         <section
           className="explore-map"
           aria-label="경북 탐험 지도"
@@ -481,19 +358,14 @@ export default function ExplorePage({
                 type="button"
                 className={[
                   'explore-region',
-                  active &&
-                    'explore-region--current',
-                  selected &&
-                    'explore-region--selected',
-                  locked &&
-                    'explore-region--locked',
+                  active && 'explore-region--current',
+                  selected && 'explore-region--selected',
+                  locked && 'explore-region--locked',
                 ]
                   .filter(Boolean)
                   .join(' ')}
                 style={{
-                  left: `${
-                    (region.x / 402) * 100
-                  }%`,
+                  left: `${(region.x / 402) * 100}%`,
                   top: `${region.y}px`,
                 }}
                 onClick={() => {
@@ -507,11 +379,7 @@ export default function ExplorePage({
                 }
               >
                 <span className="explore-region__code">
-                  R
-                  {String(region.id).padStart(
-                    2,
-                    '0',
-                  )}
+                  R{String(region.id).padStart(2, '0')}
                 </span>
 
                 <img
@@ -521,8 +389,7 @@ export default function ExplorePage({
                 />
 
                 <strong className="explore-region__name">
-                  {region.name}{' '}
-                  {region.product}
+                  {region.name} {region.product}
                 </strong>
 
                 <span className="explore-region__status">
@@ -545,7 +412,6 @@ export default function ExplorePage({
           })}
         </section>
 
-        {/* Selected Region Detail */}
         <section
           className="explore-detail"
           aria-label="선택 지역 정보"
@@ -594,14 +460,12 @@ export default function ExplorePage({
           </div>
         </section>
 
-        {/* Notice */}
         {notice && (
           <div
             className="explore-notice"
             role="status"
           >
             <span>{notice}</span>
-
             <button
               type="button"
               onClick={() => setNotice('')}
@@ -613,15 +477,10 @@ export default function ExplorePage({
         )}
       </div>
 
-      {/* Shared Game Menu */}
       {menuOpen && (
         <GameMenu
-          onClose={() =>
-            setMenuOpen(false)
-          }
-          onOpenMap={() =>
-            setMenuOpen(false)
-          }
+          onClose={() => setMenuOpen(false)}
+          onOpenMap={() => setMenuOpen(false)}
           onNotice={setNotice}
           onOpenQuiz={onOpenQuiz}
         />

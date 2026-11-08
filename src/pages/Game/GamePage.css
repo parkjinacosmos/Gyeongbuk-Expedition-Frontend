@@ -1,4 +1,3 @@
-
 /* ========================================
    Game Page
 ======================================== */
@@ -35,126 +34,20 @@
 }
 
 /* ========================================
-   Header
+   Shared Header
 ======================================== */
 
-.game-header {
-  position: relative;
-  z-index: 10;
-  width: 100%;
-  height: 156px;
-}
+/*
+  프로필, 레벨, 지역, 골드, 메뉴 스타일은
+  src/components/GameHeader/GameHeader.css에서
+  공통으로 관리합니다.
 
-/* Profile */
-
-.game-header__profile {
-  position: absolute;
-  top: 45px;
-  left: 12px;
-
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.game-header__profile > img {
-  width: 42px;
-  height: 42px;
-  object-fit: contain;
-}
-
-.game-header__profile > div {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.game-header__profile strong {
-  font-size: 12px;
-  font-weight: 800;
-}
-
-.game-header__profile span {
-  max-width: 76px;
-  overflow: hidden;
-  font-size: 10px;
-  font-weight: 600;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* Region */
-
-.game-header__region {
-  position: absolute;
-  top: 31px;
-  left: 50%;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-
-  width: 158px;
-  text-align: center;
-  transform: translateX(-50%);
-}
-
-.game-header__region > span {
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.game-header__region > strong {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-
-  font-size: 16px;
-  font-weight: 900;
-  white-space: nowrap;
-}
-
-.game-header__region > strong img {
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
-}
-
-.game-header__region > small {
-  display: none;
-}
-
-/* Gold */
-
-.game-header__gold {
-  position: absolute;
-  top: 48px;
-  right: 14px;
-
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 4px;
-}
-
-.game-header__gold img {
-  width: 22px;
-  height: 22px;
-  object-fit: contain;
-}
-
-.game-header__gold strong {
-  font-size: 13px;
-  font-weight: 800;
-}
+  이 파일에서는 게임 전용 배속 버튼만 관리합니다.
+*/
 
 /* ========================================
-   Header Controls
+   Game Speed Button
 ======================================== */
-
-/* 배속 버튼 - 메뉴 바로 왼쪽 */
 
 .game-header .game-speed-button {
   position: absolute;
@@ -193,33 +86,6 @@
   transform: scale(0.96);
 }
 
-/* Menu Button */
-
-.game-header__menu {
-  position: absolute;
-  top: 90px;
-  right: 12px;
-  z-index: 21;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 40px;
-  height: 40px;
-  padding: 0;
-
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-}
-
-.game-header__menu img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
 /* ========================================
    Game Scene
 ======================================== */
@@ -255,11 +121,11 @@
   z-index: 5;
 
   width: calc(100% - 32px);
-  margin: 12px 16px 0;
-  padding: 14px 14px 15px;
+  margin: 4px 16px 0;
+  padding: 10px 12px 11px;
 
   border: 2px solid #9c713b;
-  border-radius: 19px;
+  border-radius: 15px;
 
   background: linear-gradient(
     180deg,
@@ -270,23 +136,68 @@
   box-shadow: 0 5px 0 rgb(112 76 38 / 18%);
 }
 
+/* ========================================
+   Reward Header
+======================================== */
+
+.game-rewards__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+}
+
 .game-rewards__top {
   display: flex;
   flex-direction: column;
-  gap: 9px;
+  gap: 5px;
 }
 
 .game-rewards__top h2 {
   margin: 0;
   color: #5b3a21;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 900;
+}
+
+.game-rewards__title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+}
+
+.game-rewards__title h2 {
+  margin: 0;
+  color: #5b3a21;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.game-rewards__treasure {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+/* ========================================
+   Reward Timer
+======================================== */
+
+.game-rewards__timer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  width: 115px;
+  flex-shrink: 0;
 }
 
 .game-rewards__time {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .game-rewards__time > span {
@@ -297,14 +208,27 @@
   font-variant-numeric: tabular-nums;
 }
 
+.game-rewards__timer .game-rewards__time {
+  width: 100%;
+  justify-content: flex-end;
+  font-size: 11px;
+}
+
 .game-rewards__track {
   width: 100%;
-  height: 11px;
+  height: 8px;
   overflow: hidden;
 
   border: 1px solid #b78b51;
   border-radius: 999px;
   background: #e4d4ae;
+}
+
+.game-rewards__timer .game-rewards__track {
+  width: 100%;
+  height: 7px;
+  margin: 0;
+  border-radius: 999px;
 }
 
 .game-rewards__progress {
@@ -320,11 +244,15 @@
   transition: width 0.4s ease;
 }
 
+/* ========================================
+   Reward Items
+======================================== */
+
 .game-rewards__bottom {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-  margin-top: 15px;
+  gap: 5px;
+  margin-top: 9px;
 }
 
 .game-rewards__item {
@@ -332,37 +260,39 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 3px;
   min-width: 0;
 }
 
 .game-rewards__item img {
-  width: 36px;
-  height: 36px;
+  width: 27px;
+  height: 27px;
   object-fit: contain;
 }
 
 .game-rewards__item strong {
   color: #5b3a21;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 900;
   font-variant-numeric: tabular-nums;
 }
 
 .game-rewards__item small {
   color: #806143;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
 }
 
-/* Claim Button */
+/* ========================================
+   Claim Button
+======================================== */
 
 .game-rewards__claim {
   grid-column: 1 / -1;
 
   width: 100%;
-  height: 42px;
-  margin-top: 8px;
+  height: 35px;
+  margin-top: 4px;
 
   border: 2px solid #8a5c2b;
   border-radius: 13px;
@@ -374,7 +304,7 @@
   );
 
   color: #583515;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 900;
   cursor: pointer;
 }
@@ -438,31 +368,6 @@
 ======================================== */
 
 @media (max-width: 360px) {
-  .game-header__profile {
-    left: 8px;
-  }
-
-  .game-header__profile > img {
-    width: 36px;
-    height: 36px;
-  }
-
-  .game-header__region {
-    width: 140px;
-  }
-
-  .game-header__region > strong {
-    font-size: 14px;
-  }
-
-  .game-header__gold {
-    right: 9px;
-  }
-
-  .game-header__gold strong {
-    font-size: 11px;
-  }
-
   .game-header .game-speed-button {
     right: 57px;
     min-width: 70px;
@@ -474,108 +379,4 @@
     margin-right: 12px;
     margin-left: 12px;
   }
-}
-
-/* 쌓인 보상 카드 크기 축소 */
-
-.game-rewards {
-  margin-top: 4px;
-  padding: 10px 12px 11px;
-  border-radius: 15px;
-}
-
-.game-rewards__top {
-  gap: 5px;
-}
-
-.game-rewards__top h2 {
-  font-size: 14px;
-}
-
-.game-rewards__time {
-  gap: 4px;
-}
-
-.game-rewards__track {
-  height: 8px;
-}
-
-.game-rewards__bottom {
-  gap: 5px;
-  margin-top: 9px;
-}
-
-.game-rewards__item {
-  gap: 3px;
-}
-
-.game-rewards__item img {
-  width: 27px;
-  height: 27px;
-}
-
-.game-rewards__item strong {
-  font-size: 13px;
-}
-
-.game-rewards__item small {
-  font-size: 9px;
-}
-
-.game-rewards__claim {
-  height: 35px;
-  margin-top: 4px;
-  font-size: 12px;
-}
-
-/* 쌓인 보상 헤더 */
-.game-rewards__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  width: 100%;
-}
-
-/* 보물상자 + 제목 */
-.game-rewards__title {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  flex-shrink: 0;
-}
-
-.game-rewards__title h2 {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 800;
-}
-
-.game-rewards__treasure {
-  width: 36px;
-  height: 36px;
-  object-fit: contain;
-}
-
-/* 오른쪽 시간 표시 + 진행 바 */
-.game-rewards__timer {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
-  width: 115px;
-  flex-shrink: 0;
-}
-
-.game-rewards__timer .game-rewards__time {
-  width: 100%;
-  justify-content: flex-end;
-  font-size: 11px;
-}
-
-.game-rewards__timer .game-rewards__track {
-  width: 100%;
-  height: 7px;
-  margin: 0;
-  border-radius: 999px;
 }
