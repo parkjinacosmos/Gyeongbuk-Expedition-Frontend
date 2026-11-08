@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 
 import './GameMenu.css';
 
@@ -18,13 +19,71 @@ export default function GameMenu({
   onOpenQuiz,
   onNotice,
 }: GameMenuProps) {
-  const handleNotice = (message: string) => {
+  const menuRef = useRef<HTMLElement>(null);
+  const closeRef = useRef(onClose);
+
+  useEffect(() => {
+    closeRef.current = onClose;
+  }, [onClose]);
+
+  // ========================================
+  // Keyboard Handling
+  // ========================================
+
+  useEffect(() => {
+    const previousFocus = document.activeElement;
+
+    const firstButton =
+      menuRef.current?.querySelector<HTMLButtonElement>(
+        'button',
+      );
+
+    firstButton?.focus();
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeRef.current();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+
+      if (previousFocus instanceof HTMLElement) {
+        previousFocus.focus();
+      }
+    };
+  }, []);
+
+  // ========================================
+  // Navigation
+  // ========================================
+
+  function handleOpenQuiz() {
+    onClose();
+    onOpenQuiz();
+  }
+
+  function handleOpenMap() {
+    onClose();
+    onOpenMap();
+  }
+
+  function handleNotice(message: string) {
     onClose();
     onNotice(message);
-  };
+  }
+
+  // ========================================
+  // Render
+  // ========================================
 
   return (
     <>
+      {/* Backdrop */}
       <button
         type="button"
         className="game-menu__backdrop"
@@ -32,13 +91,16 @@ export default function GameMenu({
         onClick={onClose}
       />
 
-      <nav className="game-menu" aria-label="탐험 메뉴">
+      {/* Menu */}
+      <nav
+        ref={menuRef}
+        className="game-menu"
+        aria-label="탐험 메뉴"
+      >
+        {/* Quiz */}
         <button
           type="button"
-          onClick={() => {
-            onClose();
-            onOpenQuiz();
-          }}
+          onClick={handleOpenQuiz}
         >
           <span className="game-menu__content">
             <img
@@ -48,15 +110,19 @@ export default function GameMenu({
             />
             <span>지역 퀴즈</span>
           </span>
-          <span className="game-menu__arrow">›</span>
+
+          <span
+            className="game-menu__arrow"
+            aria-hidden="true"
+          >
+            ›
+          </span>
         </button>
 
+        {/* Map */}
         <button
           type="button"
-          onClick={() => {
-            onClose();
-            onOpenMap();
-          }}
+          onClick={handleOpenMap}
         >
           <span className="game-menu__content">
             <img
@@ -66,9 +132,16 @@ export default function GameMenu({
             />
             <span>지역 지도</span>
           </span>
-          <span className="game-menu__arrow">›</span>
+
+          <span
+            className="game-menu__arrow"
+            aria-hidden="true"
+          >
+            ›
+          </span>
         </button>
 
+        {/* Settings */}
         <button
           type="button"
           onClick={() =>
@@ -83,7 +156,13 @@ export default function GameMenu({
             />
             <span>설정</span>
           </span>
-          <span className="game-menu__arrow">›</span>
+
+          <span
+            className="game-menu__arrow"
+            aria-hidden="true"
+          >
+            ›
+          </span>
         </button>
       </nav>
     </>

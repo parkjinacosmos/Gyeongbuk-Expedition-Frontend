@@ -21,10 +21,53 @@ interface QuizPageProps {
   onBack: () => void;
 }
 
+interface PendingSubmission {
+  setId: number;
+  key: string;
+  answers: {
+    order_no: number;
+    selected_index: number;
+  }[];
+}
+
 function getErrorMessage(error: unknown): string {
   return error instanceof Error
     ? error.message
     : '잠시 후 다시 시도해 주세요.';
+}
+
+function getErrorCode(error: unknown): string {
+  if (
+    error !== null &&
+    typeof error === 'object' &&
+    'code' in error
+  ) {
+    return String(error.code);
+  }
+
+  return '';
+}
+
+function getPopupType(set: QuizSet): QuizPopupType {
+  if (!set.result) {
+    return 'completed';
+  }
+
+  return set.result.correct_count === set.result.total
+    ? 'correct'
+    : 'incorrect';
+}
+
+function getSavedAnswers(set: QuizSet): Record<number, number> {
+  const saved: Record<number, number> = {};
+
+  for (const question of set.questions) {
+    if (question.selected_index !== null) {
+      saved[question.order_no] = question.selected_index;
+    }
+  }
+
+  return saved;
 }
 
 export default function QuizPage({
@@ -34,22 +77,33 @@ export default function QuizPage({
   const [user, setUser] = useState<ExploreUser | null>(null);
   const [quizSet, setQuizSet] = useState<QuizSet | null>(null);
 
-  const [answers, setAnswers] = useState<Record<number, number>>({});
+  const [answers, setAnswers] =
+    useState<Record<number, number>>({});
+
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
   const [menuOpen, setMenuOpen] = useState(false);
-  const [popupType, setPopupType] = useState<QuizPopupType | null>(
-    null,
-  );
+  const [popupType, setPopupType] =
+    useState<QuizPopupType | null>(null);
 
   const [message, setMessage] = useState('');
-  const submitKey = useRef<string | null>(null);
+
+  const mounted = useRef(false);
+  const submittingRef = useRef(false);
+
+  // 실패한 요청을 동일한 키와 답변으로 재시도
+  const pendingSubmission =
+    useRef<PendingSubmission | null>(null);
+
+  // ========================================
+  // Load Quiz
+  // ========================================
 
   useEffect(() => {
-    let mounted = true;
+    mounted.current = true;
 
     async function loadQuiz() {
       setLoading(true);
@@ -61,149 +115,216 @@ export default function QuizPage({
           quizApi.issue(),
         ]);
 
-        if (!mounted) return;
+        if (!mounted.current) return;
 
         setUser(player);
         setQuizSet(issued.set);
-
-        const initialAnswers: Record<number, number> = {};
-
-        issued.set.questions.forEach((question) => {
-          if (question.selected_index !== null) {
-            initialAnswers[question.order_no] =
-              question.selected_index;
-          }
-        });
-
-        setAnswers(initialAnswers);
+        setAnswers(getSavedAnswers(issued.set));
+        setCurrentIndex(0);
 
         if (issued.set.status === 'SUBMITTED') {
           setPopupType('completed');
         }
       } catch (error) {
-        if (mounted) setMessage(getErrorMessage(error));
+        if (!mounted.current) return;
+
+        setMessage(
+          `퀴즈를 불러오지 못했어요. ${getErrorMessage(error)}`,
+        );
       } finally {
-        if (mounted) setLoading(false);
+        if (mounted.current) {
+          setLoading(false);
+        }
       }
     }
 
     void loadQuiz();
 
     return () => {
-      mounted = false;
+      mounted.current = false;
     };
   }, []);
+
+  // ========================================
+  // Derived Data
+  // ========================================
 
   const questions = quizSet?.questions ?? [];
   const question = questions[currentIndex];
 
   const completed = quizSet?.status === 'SUBMITTED';
   const result = quizSet?.result ?? null;
- 
+
   const answeredCount = questions.filter(
     (item) => answers[item.order_no] !== undefined,
   ).length;
 
   const allAnswered =
-    questions.length === 3 && answeredCount === 3;
+    questions.length > 0 &&
+    answeredCount === questions.length;
+
+  // ========================================
+  // Select Answer
+  // ========================================
 
   function selectAnswer(index: number) {
-    if (!question || completed) return;
+    if (
+      !question ||
+      completed ||
+      submittingRef.current
+    ) {
+      return;
+    }
 
     setAnswers((previous) => ({
       ...previous,
       [question.order_no]: index,
     }));
+
+    // 답변을 수정하면 이전 실패 요청은 재사용하지 않음
+    pendingSubmission.current = null;
   }
 
+  // ========================================
+  // Result Popup
+  // ========================================
+
   function openResultPopup() {
-    if (!result) {
+    if (!quizSet || !result) {
       setMessage('퀴즈 결과를 불러오지 못했어요.');
       return;
     }
 
-    setPopupType(
-      result.correct_count === result.total
-        ? 'correct'
-        : 'incorrect',
-    );
+    setPopupType(getPopupType(quizSet));
   }
 
+  // ========================================
+  // Submit Quiz
+  // ========================================
+
   async function submitQuiz() {
-    if (!quizSet || !allAnswered || completed || submitting) {
+    if (
+      !quizSet ||
+      !allAnswered ||
+      completed ||
+      submittingRef.current
+    ) {
       return;
     }
 
+    submittingRef.current = true;
     setSubmitting(true);
     setMessage('');
 
-    const key = submitKey.current ?? crypto.randomUUID();
-    submitKey.current = key;
+    const request: PendingSubmission =
+      pendingSubmission.current?.setId === quizSet.set_id
+        ? pendingSubmission.current
+        : {
+            setId: quizSet.set_id,
+            key: crypto.randomUUID(),
+            answers: questions.map((item) => ({
+              order_no: item.order_no,
+              selected_index: answers[item.order_no],
+            })),
+          };
+
+    pendingSubmission.current = request;
 
     try {
       const response = await quizApi.submit(
-        quizSet.set_id,
-        questions.map((item) => ({
-          order_no: item.order_no,
-          selected_index: answers[item.order_no],
-        })),
-        key,
+        request.setId,
+        request.answers,
+        request.key,
       );
 
+      if (!mounted.current) return;
+
+      pendingSubmission.current = null;
+
       setQuizSet(response.set);
-      submitKey.current = null;
+      setAnswers(getSavedAnswers(response.set));
 
-      const submittedResult = response.set.result;
-
-      if (submittedResult) {
-        setPopupType(
-          submittedResult.correct_count ===
-            submittedResult.total
-            ? 'correct'
-            : 'incorrect',
-        );
+      if (response.set.result) {
+        setPopupType(getPopupType(response.set));
       } else {
         setMessage(
           '제출은 완료되었지만 결과를 불러오지 못했어요.',
         );
       }
 
-      // 서버 연결 전 개발용 응답의 유저 정보 갱신
       try {
-        setUser(await exploreApi.getUser());
+        const updatedUser = await exploreApi.getUser();
+
+        if (mounted.current) {
+          setUser(updatedUser);
+        }
       } catch {
-        // 결과 표시는 유지
+        // 퀴즈 결과 표시는 유지
       }
     } catch (error) {
-      const code =
-        error &&
-        typeof error === 'object' &&
-        'code' in error
-          ? String(error.code)
-          : '';
+      if (!mounted.current) return;
 
-      if (code === 'QUIZ_ALREADY_SUBMITTED') {
-        try {
-          const latest = await quizApi.today();
+      // 서버에서 이미 제출이 완료되었는지 확인
+      try {
+        const latest = await quizApi.today();
+
+        if (
+          latest.set_id === request.setId &&
+          latest.status === 'SUBMITTED'
+        ) {
+          pendingSubmission.current = null;
+
           setQuizSet(latest);
-          setPopupType('completed');
-          submitKey.current = null;
-        } catch {
-          setMessage(getErrorMessage(error));
+          setAnswers(getSavedAnswers(latest));
+          setPopupType(getPopupType(latest));
+
+          try {
+            const updatedUser = await exploreApi.getUser();
+
+            if (mounted.current) {
+              setUser(updatedUser);
+            }
+          } catch {
+            // 결과는 유지
+          }
+
+          return;
         }
+      } catch {
+        // 상태 조회 실패 시 기존 오류 표시
+      }
+
+      if (getErrorCode(error) === 'QUIZ_ALREADY_SUBMITTED') {
+        setMessage(
+          '오늘의 퀴즈는 이미 제출했어요. 화면을 다시 열어 결과를 확인해 주세요.',
+        );
       } else {
-        setMessage(getErrorMessage(error));
+        setMessage(
+          `퀴즈 제출에 실패했어요. ${getErrorMessage(error)}`,
+        );
       }
     } finally {
-      setSubmitting(false);
+      submittingRef.current = false;
+
+      if (mounted.current) {
+        setSubmitting(false);
+      }
     }
   }
 
+  // ========================================
+  // Render
+  // ========================================
+
   return (
     <main className="quiz-page">
-      <div className="quiz-page__background" aria-hidden="true" />
+      <div
+        className="quiz-page__background"
+        aria-hidden="true"
+      />
 
       <div className="quiz-page__viewport">
+        {/* Header */}
         <header className="quiz-hud">
           <div className="quiz-hud__profile">
             <img src={profileImage} alt="" />
@@ -241,6 +362,7 @@ export default function QuizPage({
 
           <div className="quiz-hud__gold">
             <img src={goldImage} alt="" />
+
             <strong>
               {user?.gold.toLocaleString() ?? '—'}
             </strong>
@@ -256,6 +378,7 @@ export default function QuizPage({
           </button>
         </header>
 
+        {/* Quiz Content */}
         <section className="quiz-content">
           <div className="quiz-wood-sign">
             <h1>오늘의 퀴즈</h1>
@@ -283,17 +406,23 @@ export default function QuizPage({
               </div>
             ) : (
               <>
+                {/* Question Header */}
                 <div className="quiz-question-panel__heading">
-                  <span>{quizSet?.region.name} 지역 퀴즈</span>
+                  <span>
+                    {quizSet?.region.name} 지역 퀴즈
+                  </span>
+
                   <strong>
                     {currentIndex + 1} / {questions.length}
                   </strong>
                 </div>
 
+                {/* Question */}
                 <h2 className="quiz-question">
                   {question.question}
                 </h2>
 
+                {/* Choices */}
                 <div className="quiz-choices">
                   {question.choices.map((choice, index) => {
                     const selected =
@@ -314,12 +443,14 @@ export default function QuizPage({
                         type="button"
                         className={[
                           'quiz-choice',
-                          selected && 'quiz-choice--selected',
-                          correct && 'quiz-choice--correct',
+                          selected &&
+                            'quiz-choice--selected',
+                          correct &&
+                            'quiz-choice--correct',
                         ]
                           .filter(Boolean)
                           .join(' ')}
-                        disabled={completed}
+                        disabled={completed || submitting}
                         aria-pressed={selected}
                         onClick={() => selectAnswer(index)}
                       >
@@ -335,6 +466,7 @@ export default function QuizPage({
                   })}
                 </div>
 
+                {/* Navigation */}
                 <div className="quiz-progress">
                   <button
                     type="button"
@@ -349,7 +481,7 @@ export default function QuizPage({
                   <span>
                     {completed
                       ? '오늘 참여 완료'
-                      : `${answeredCount} / 3 답변 완료`}
+                      : `${answeredCount} / ${questions.length} 답변 완료`}
                   </span>
 
                   <button
@@ -365,11 +497,13 @@ export default function QuizPage({
                   </button>
                 </div>
 
+                {/* Submit */}
                 <button
                   type="button"
                   className="quiz-primary-button"
                   disabled={
-                    !completed && (!allAnswered || submitting)
+                    !completed &&
+                    (!allAnswered || submitting)
                   }
                   onClick={() => {
                     if (completed) {
@@ -389,12 +523,17 @@ export default function QuizPage({
             )}
           </section>
 
+          {/* Error Message */}
           {message && question && (
-            <p className="quiz-message" role="alert">
+            <p
+              className="quiz-message"
+              role="alert"
+            >
               {message}
             </p>
           )}
 
+          {/* Back */}
           <button
             type="button"
             className="quiz-return-button"
@@ -405,6 +544,7 @@ export default function QuizPage({
         </section>
       </div>
 
+      {/* Game Menu */}
       {menuOpen && (
         <GameMenu
           onClose={() => setMenuOpen(false)}
@@ -417,6 +557,7 @@ export default function QuizPage({
         />
       )}
 
+      {/* Quiz Result Popup */}
       {popupType && (
         <QuizPopup
           type={popupType}

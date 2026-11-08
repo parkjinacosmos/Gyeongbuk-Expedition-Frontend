@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 
@@ -7,21 +6,20 @@ import './GameScene.css';
 interface GameSceneProps {
   speed: 1 | 2;
   collectedPieces: number;
-  lastSettledAt?: string;
-  serverOffsetMs?: number;
-  carrySeconds?: number;
+  regionId?: number;
+  specialtyName?: string;
 }
 
-type AppleType = 'normal' | 'special';
-type AppleStatus = 'moving' | 'dying';
+type MonsterType = 'normal' | 'special';
+type MonsterStatus = 'moving' | 'dying';
 
-interface Apple {
+interface Monster {
   id: number;
   x: number;
   y: number;
-  type: AppleType;
+  type: MonsterType;
   hp: number;
-  status: AppleStatus;
+  status: MonsterStatus;
   deathElapsed: number;
 }
 
@@ -29,20 +27,21 @@ const PLAYER_X = 23;
 const PLAYER_MIN_Y = 20;
 const PLAYER_MAX_Y = 78;
 
-const APPLE_SPEED = 38;
+const MONSTER_SPEED = 38;
 const SPAWN_INTERVAL = 4000;
 const DEATH_DURATION = 450;
 const COLLISION_DISTANCE = 34;
 const MAX_HP = 100;
+const MAX_MONSTERS = 12;
 
 const ASSETS = {
   character: '/game/character.png',
   apple: '/game/apple.png',
   specialApple: '/game/apple-alt.png',
+  mackerel: '/regions/andong-mackerel.png',
 } as const;
 
-// 사과가 번갈아 등장하도록 생성
-function createApple(id: number): Apple {
+function createMonster(id: number): Monster {
   return {
     id,
     x: 110,
@@ -57,11 +56,13 @@ function createApple(id: number): Apple {
 export default function GameScene({
   speed,
   collectedPieces,
+  regionId = 1,
+  specialtyName,
 }: GameSceneProps) {
   const sceneRef = useRef<HTMLDivElement>(null);
 
   const playerYRef = useRef(60);
-  const applesRef = useRef<Apple[]>([]);
+  const monstersRef = useRef<Monster[]>([]);
   const nextIdRef = useRef(0);
 
   const lastFrameRef = useRef<number | null>(null);
@@ -69,7 +70,20 @@ export default function GameScene({
   const pointerRef = useRef<number | null>(null);
 
   const [playerY, setPlayerY] = useState(60);
-  const [apples, setApples] = useState<Apple[]>([]);
+  const [monsters, setMonsters] = useState<Monster[]>([]);
+
+  const isAndong = regionId === 2;
+
+  const monsterImage = isAndong
+    ? ASSETS.mackerel
+    : ASSETS.apple;
+
+  const specialMonsterImage = isAndong
+    ? ASSETS.mackerel
+    : ASSETS.specialApple;
+
+  const pieceName =
+    specialtyName ?? (isAndong ? '간고등어' : '사과');
 
   // ========================================
   // Player Movement
@@ -80,6 +94,7 @@ export default function GameScene({
     if (!scene) return;
 
     const rect = scene.getBoundingClientRect();
+
     if (rect.height <= 0) return;
 
     const percent =
@@ -101,6 +116,18 @@ export default function GameScene({
   }
 
   // ========================================
+  // Reset Scene When Region Changes
+  // ========================================
+
+  useEffect(() => {
+    monstersRef.current = [];
+    nextIdRef.current = 0;
+    spawnElapsedRef.current = 0;
+
+    setMonsters([]);
+  }, [regionId]);
+
+  // ========================================
   // Animation Loop
   // ========================================
 
@@ -108,8 +135,7 @@ export default function GameScene({
     let animationId = 0;
 
     const animate = (timestamp: number) => {
-      const previous =
-        lastFrameRef.current ?? timestamp;
+      const previous = lastFrameRef.current ?? timestamp;
 
       const delta = Math.max(
         0,
@@ -118,14 +144,14 @@ export default function GameScene({
 
       lastFrameRef.current = timestamp;
 
-      // 배속은 화면 연출에만 적용
+      // 2배속은 화면 애니메이션에만 적용
       const movementDelta = delta * speed;
 
       const scene = sceneRef.current;
 
       if (scene) {
         // ------------------------------------
-        // Apple Spawn
+        // Monster Spawn
         // ------------------------------------
 
         spawnElapsedRef.current += delta * 1000;
@@ -135,45 +161,47 @@ export default function GameScene({
         ) {
           spawnElapsedRef.current -= SPAWN_INTERVAL;
 
-          applesRef.current.push(
-            createApple(nextIdRef.current++),
-          );
+          if (
+            monstersRef.current.length < MAX_MONSTERS
+          ) {
+            monstersRef.current.push(
+              createMonster(nextIdRef.current++),
+            );
+          }
         }
 
         // ------------------------------------
-        // Apple Movement & Collision
+        // Monster Movement & Collision
         // ------------------------------------
 
         const rect = scene.getBoundingClientRect();
 
-        applesRef.current = applesRef.current
-          .map((apple): Apple => {
-            // 사망 중인 사과는 이동하지 않음
-            if (apple.status === 'dying') {
+        monstersRef.current = monstersRef.current
+          .map((monster): Monster => {
+            if (monster.status === 'dying') {
               return {
-                ...apple,
+                ...monster,
                 deathElapsed:
-                  apple.deathElapsed + delta * 1000,
+                  monster.deathElapsed + delta * 1000,
               };
             }
 
             const nextX =
-              apple.x - APPLE_SPEED * movementDelta;
+              monster.x - MONSTER_SPEED * movementDelta;
 
             const dx =
               ((nextX - PLAYER_X) / 100) *
               rect.width;
 
             const dy =
-              ((apple.y - playerYRef.current) / 100) *
+              ((monster.y - playerYRef.current) / 100) *
               rect.height;
 
             const distance = Math.hypot(dx, dy);
 
-            // 사자와 충돌하면 체력 0
             if (distance < COLLISION_DISTANCE) {
               return {
-                ...apple,
+                ...monster,
                 x: nextX,
                 hp: 0,
                 status: 'dying',
@@ -182,19 +210,19 @@ export default function GameScene({
             }
 
             return {
-              ...apple,
+              ...monster,
               x: nextX,
             };
           })
-          .filter((apple) => {
-            if (apple.status === 'dying') {
-              return apple.deathElapsed < DEATH_DURATION;
+          .filter((monster) => {
+            if (monster.status === 'dying') {
+              return monster.deathElapsed < DEATH_DURATION;
             }
 
-            return apple.x >= -10;
+            return monster.x >= -10;
           });
 
-        setApples([...applesRef.current]);
+        setMonsters([...monstersRef.current]);
       }
 
       animationId = requestAnimationFrame(animate);
@@ -234,7 +262,9 @@ export default function GameScene({
           movePlayer(event.clientY);
         }}
         onPointerMove={(event) => {
-          if (pointerRef.current !== event.pointerId) {
+          if (
+            pointerRef.current !== event.pointerId
+          ) {
             return;
           }
 
@@ -247,25 +277,25 @@ export default function GameScene({
           releasePointer(event.pointerId);
         }}
       >
-        {/* ==================================
-            Apples
-        ================================== */}
+        {/* Monsters */}
+        {monsters.map((monster) => {
+          const isDying =
+            monster.status === 'dying';
 
-        {apples.map((apple) => {
-          const isDying = apple.status === 'dying';
-          const isLarge = apple.type === 'normal';
+          const isLarge =
+            monster.type === 'normal';
 
           return (
             <div
-              key={apple.id}
+              key={monster.id}
               className={`runner-game__apple ${
                 isDying
                   ? 'runner-game__apple--dying'
                   : ''
               }`}
               style={{
-                left: `${apple.x}%`,
-                top: `${apple.y}%`,
+                left: `${monster.x}%`,
+                top: `${monster.y}%`,
               }}
             >
               <div
@@ -279,26 +309,25 @@ export default function GameScene({
                   className="runner-game__apple-image"
                   src={
                     isLarge
-                      ? ASSETS.apple
-                      : ASSETS.specialApple
+                      ? monsterImage
+                      : specialMonsterImage
                   }
                   alt=""
                   draggable={false}
                 />
 
-                {/* 체력바: 사과 바로 아래 */}
                 <div
                   className="runner-game__apple-health"
                   role="progressbar"
-                  aria-label="사과 몬스터 체력"
+                  aria-label="몬스터 체력"
                   aria-valuemin={0}
                   aria-valuemax={MAX_HP}
-                  aria-valuenow={apple.hp}
+                  aria-valuenow={monster.hp}
                 >
                   <div
                     className="runner-game__apple-health-fill"
                     style={{
-                      width: `${apple.hp}%`,
+                      width: `${monster.hp}%`,
                     }}
                   />
                 </div>
@@ -307,10 +336,7 @@ export default function GameScene({
           );
         })}
 
-        {/* ==================================
-            Player
-        ================================== */}
-
+        {/* Player */}
         <div
           className="runner-game__player"
           style={{
@@ -325,15 +351,12 @@ export default function GameScene({
           />
         </div>
 
-        {/* ==================================
-            Collected Pieces
-        ================================== */}
-
+        {/* Collected Pieces */}
         <div className="runner-game__pieces">
-          <img src={ASSETS.apple} alt="" />
+          <img src={monsterImage} alt="" />
 
           <span>
-            현재 보유: 사과 조각{' '}
+            현재 보유: {pieceName} 조각{' '}
             {collectedPieces.toLocaleString()}개
           </span>
         </div>

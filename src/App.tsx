@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 
 import ExplorePage from './pages/Explore/ExplorePage';
@@ -10,13 +9,28 @@ import BottomNavigation from './components/BottomNavigation/BottomNavigation';
 
 import type { NavigationItem } from './components/BottomNavigation/BottomNavigation';
 
+// ========================================
+// Types
+// ========================================
+
 type ExploreScreen = 'map' | 'region-info' | 'game' | 'quiz';
+
 type QuizReturnScreen = Exclude<ExploreScreen, 'quiz'>;
 
-const ACTIVE_TAB_KEY = 'gyeongbuk-active-tab';
-const EXPLORE_SCREEN_KEY = 'gyeongbuk-explore-screen';
-const REGION_ID_KEY = 'gyeongbuk-selected-region';
-const QUIZ_RETURN_KEY = 'gyeongbuk-quiz-return-screen';
+// ========================================
+// LocalStorage Keys
+// ========================================
+
+const STORAGE_KEYS = {
+  activeTab: 'gyeongbuk-active-tab',
+  exploreScreen: 'gyeongbuk-explore-screen',
+  selectedRegionId: 'gyeongbuk-selected-region',
+  quizReturnScreen: 'gyeongbuk-quiz-return-screen',
+} as const;
+
+// ========================================
+// Page Titles
+// ========================================
 
 const pageTitles: Record<
   Exclude<NavigationItem, 'explore'>,
@@ -27,70 +41,91 @@ const pageTitles: Record<
   shop: '상점',
 };
 
-function getSavedTab(): NavigationItem {
+// ========================================
+// Storage Helpers
+// ========================================
+
+function readStorage(key: string): string | null {
   try {
-    const saved = localStorage.getItem(ACTIVE_TAB_KEY);
-
-    if (
-      saved === 'explore' ||
-      saved === 'character' ||
-      saved === 'book' ||
-      saved === 'shop'
-    ) {
-      return saved;
-    }
+    return localStorage.getItem(key);
   } catch {
-    // 저장소 사용 불가
+    return null;
   }
+}
 
-  return 'explore';
+function writeStorage(key: string, value: string): void {
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    // 저장소 사용 불가 시에도 앱은 정상 동작
+  }
+}
+
+function isNavigationItem(
+  value: string | null,
+): value is NavigationItem {
+  return (
+    value === 'explore' ||
+    value === 'character' ||
+    value === 'book' ||
+    value === 'shop'
+  );
+}
+
+function isExploreScreen(
+  value: string | null,
+): value is ExploreScreen {
+  return (
+    value === 'map' ||
+    value === 'region-info' ||
+    value === 'game' ||
+    value === 'quiz'
+  );
+}
+
+function isQuizReturnScreen(
+  value: string | null,
+): value is QuizReturnScreen {
+  return (
+    value === 'map' ||
+    value === 'region-info' ||
+    value === 'game'
+  );
+}
+
+// ========================================
+// Initial State
+// ========================================
+
+function getSavedTab(): NavigationItem {
+  const saved = readStorage(STORAGE_KEYS.activeTab);
+
+  return isNavigationItem(saved) ? saved : 'explore';
 }
 
 function getSavedExploreScreen(): ExploreScreen {
-  try {
-    const saved = localStorage.getItem(EXPLORE_SCREEN_KEY);
+  const saved = readStorage(STORAGE_KEYS.exploreScreen);
 
-    if (
-      saved === 'map' ||
-      saved === 'region-info' ||
-      saved === 'game' ||
-      saved === 'quiz'
-    ) {
-      return saved;
-    }
-  } catch {
-    // 저장소 사용 불가
-  }
-
-  return 'map';
+  return isExploreScreen(saved) ? saved : 'map';
 }
 
 function getSavedRegionId(): number {
-  try {
-    const saved = Number(localStorage.getItem(REGION_ID_KEY));
-    return saved === 1 || saved === 2 ? saved : 2;
-  } catch {
-    return 2;
-  }
+  const saved = Number(
+    readStorage(STORAGE_KEYS.selectedRegionId),
+  );
+
+  return saved === 1 || saved === 2 ? saved : 2;
 }
 
 function getSavedQuizReturn(): QuizReturnScreen {
-  try {
-    const saved = localStorage.getItem(QUIZ_RETURN_KEY);
+  const saved = readStorage(STORAGE_KEYS.quizReturnScreen);
 
-    if (
-      saved === 'map' ||
-      saved === 'region-info' ||
-      saved === 'game'
-    ) {
-      return saved;
-    }
-  } catch {
-    // 저장소 사용 불가
-  }
-
-  return 'game';
+  return isQuizReturnScreen(saved) ? saved : 'game';
 }
+
+// ========================================
+// App
+// ========================================
 
 export default function App() {
   const [activeTab, setActiveTab] =
@@ -100,60 +135,55 @@ export default function App() {
     useState<ExploreScreen>(getSavedExploreScreen);
 
   const [selectedRegionId, setSelectedRegionId] =
-    useState(getSavedRegionId);
+    useState<number>(getSavedRegionId);
 
   const [quizReturnScreen, setQuizReturnScreen] =
     useState<QuizReturnScreen>(getSavedQuizReturn);
 
+  // ========================================
+  // Persist Navigation State
+  // ========================================
+
   useEffect(() => {
-    try {
-      localStorage.setItem(ACTIVE_TAB_KEY, activeTab);
-    } catch {
-      // 저장 실패 시에도 정상 동작
-    }
+    writeStorage(STORAGE_KEYS.activeTab, activeTab);
   }, [activeTab]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem(
-        EXPLORE_SCREEN_KEY,
-        exploreScreen,
-      );
-    } catch {
-      // 저장 실패 시에도 정상 동작
-    }
+    writeStorage(
+      STORAGE_KEYS.exploreScreen,
+      exploreScreen,
+    );
   }, [exploreScreen]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem(
-        REGION_ID_KEY,
-        String(selectedRegionId),
-      );
-    } catch {
-      // 저장 실패 시에도 정상 동작
-    }
+    writeStorage(
+      STORAGE_KEYS.selectedRegionId,
+      String(selectedRegionId),
+    );
   }, [selectedRegionId]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem(
-        QUIZ_RETURN_KEY,
-        quizReturnScreen,
-      );
-    } catch {
-      // 저장 실패 시에도 정상 동작
-    }
+    writeStorage(
+      STORAGE_KEYS.quizReturnScreen,
+      quizReturnScreen,
+    );
   }, [quizReturnScreen]);
 
-  const openMap = () => {
+  // ========================================
+  // Navigation Helpers
+  // ========================================
+
+  const navigateExplore = (screen: ExploreScreen) => {
     setActiveTab('explore');
-    setExploreScreen('map');
+    setExploreScreen(screen);
+  };
+
+  const openMap = () => {
+    navigateExplore('map');
   };
 
   const openGame = () => {
-    setActiveTab('explore');
-    setExploreScreen('game');
+    navigateExplore('game');
   };
 
   const openQuiz = () => {
@@ -161,68 +191,107 @@ export default function App() {
       setQuizReturnScreen(exploreScreen);
     }
 
-    setActiveTab('explore');
-    setExploreScreen('quiz');
+    navigateExplore('quiz');
   };
 
   const closeQuiz = () => {
-    setActiveTab('explore');
-    setExploreScreen(quizReturnScreen);
+    navigateExplore(quizReturnScreen);
   };
 
   const openRegionInfo = (regionId: number) => {
-    if (regionId !== 1 && regionId !== 2) return;
+    // 현재 MVP 지원 지역
+    if (regionId !== 1 && regionId !== 2) {
+      return;
+    }
 
     setSelectedRegionId(regionId);
-    setActiveTab('explore');
-    setExploreScreen('region-info');
+    navigateExplore('region-info');
   };
 
   const handleTabChange = (tab: NavigationItem) => {
     setActiveTab(tab);
   };
 
-  return (
-    <>
-      {activeTab === 'explore' ? (
-        exploreScreen === 'map' ? (
+  // ========================================
+  // Render Explore Screen
+  // ========================================
+
+  const renderExploreScreen = () => {
+    switch (exploreScreen) {
+      case 'map':
+        return (
           <ExplorePage
             onStartExplore={openGame}
             onOpenRegionInfo={openRegionInfo}
             onOpenQuiz={openQuiz}
           />
-        ) : exploreScreen === 'region-info' ? (
+        );
+
+      case 'region-info':
+        return (
           <RegionInfoPage
             regionId={selectedRegionId}
             onBack={openMap}
             onStartExplore={openGame}
             onOpenQuiz={openQuiz}
           />
-        ) : exploreScreen === 'quiz' ? (
+        );
+
+      case 'quiz':
+        return (
           <QuizPage
             onOpenMap={openMap}
             onBack={closeQuiz}
           />
-        ) : (
+        );
+
+      case 'game':
+        return (
           <GamePage
             onOpenMap={openMap}
             onOpenQuiz={openQuiz}
           />
-        )
-      ) : (
-        <main
-          style={{
-            minHeight: '100dvh',
-            padding: '120px 20px 140px',
-            background: '#f9f2dc',
-            color: '#54371f',
-            textAlign: 'center',
-          }}
-        >
-          <h1>{pageTitles[activeTab]}</h1>
-          <p>화면을 준비 중이에요.</p>
-        </main>
-      )}
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  // ========================================
+  // Render Placeholder Screen
+  // ========================================
+
+  const renderPlaceholderScreen = () => {
+    if (activeTab === 'explore') {
+      return null;
+    }
+
+    return (
+      <main
+        style={{
+          minHeight: '100dvh',
+          padding: '120px 20px 140px',
+          background: '#f9f2dc',
+          color: '#54371f',
+          textAlign: 'center',
+        }}
+      >
+        <h1>{pageTitles[activeTab]}</h1>
+        <p>화면을 준비 중이에요.</p>
+      </main>
+    );
+  };
+
+  // ========================================
+  // Render
+  // ========================================
+
+  return (
+    <>
+      {activeTab === 'explore'
+        ? renderExploreScreen()
+        : renderPlaceholderScreen()}
 
       <BottomNavigation
         activeTab={activeTab}

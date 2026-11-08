@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import {
   exploreApi,
@@ -27,6 +27,10 @@ import profileImage from '../../assets/explore/profile.png';
 
 import './ExplorePage.css';
 
+// ========================================
+// Types
+// ========================================
+
 interface ExplorePageProps {
   onStartExplore: () => void;
   onOpenRegionInfo: (regionId: number) => void;
@@ -47,6 +51,10 @@ interface DisplayRegion extends RegionDesign {
   status: 'current' | 'unlocked' | 'locked';
   requirement: string;
 }
+
+// ========================================
+// Region Design Data
+// ========================================
 
 const regionDesigns: RegionDesign[] = [
   {
@@ -115,11 +123,66 @@ const regionDesigns: RegionDesign[] = [
   },
 ];
 
+// ========================================
+// Helpers
+// ========================================
+
 function getErrorMessage(error: unknown): string {
   return error instanceof Error
     ? error.message
     : '알 수 없는 오류가 발생했어요.';
 }
+
+function getRegionStatus(
+  region: ExploreRegion | null,
+  isCurrent: boolean,
+): DisplayRegion['status'] {
+  if (isCurrent) {
+    return 'current';
+  }
+
+  if (region?.status === 'UNLOCKED') {
+    return 'unlocked';
+  }
+
+  return 'locked';
+}
+
+function getRegionRequirement(
+  region: ExploreRegion | null,
+  status: DisplayRegion['status'],
+): string {
+  if (status === 'current') {
+    return '현재 지역';
+  }
+
+  if (!region) {
+    return '준비 중인 지역';
+  }
+
+  if (status === 'unlocked') {
+    return '해금 완료';
+  }
+
+  if (region.unlock) {
+    const {
+      specialty_name,
+      current_pieces,
+      required_pieces,
+    } = region.unlock;
+
+    return (
+      `${specialty_name} 조각 ` +
+      `${current_pieces}/${required_pieces}개`
+    );
+  }
+
+  return '잠긴 지역';
+}
+
+// ========================================
+// Explore Page
+// ========================================
 
 export default function ExplorePage({
   onStartExplore,
@@ -132,24 +195,25 @@ export default function ExplorePage({
   const [apiRegions, setApiRegions] =
     useState<ExploreRegion[]>([]);
 
-  const [selectedId, setSelectedId] = useState(1);
+  const [selectedId, setSelectedId] =
+    useState<number>(1);
 
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
 
   // ========================================
-  // API 데이터 불러오기
+  // Load API Data
   // ========================================
 
   useEffect(() => {
     let cancelled = false;
 
     async function loadExploreData() {
-      try {
-        setLoading(true);
-        setNotice('');
+      setLoading(true);
+      setNotice('');
 
+      try {
         const [userData, regionData] =
           await Promise.all([
             exploreApi.getUser(),
@@ -191,51 +255,46 @@ export default function ExplorePage({
   }, []);
 
   // ========================================
-  // API 데이터와 디자인 결합
+  // Region Data Mapping
   // ========================================
 
-  const regions: DisplayRegion[] =
-    regionDesigns.map((design) => {
-      const apiData =
-        apiRegions.find(
-          (region) => region.id === design.id,
-        ) ?? null;
+  const regionMap = useMemo(
+    () =>
+      new Map(
+        apiRegions.map((region) => [
+          region.id,
+          region,
+        ]),
+      ),
+    [apiRegions],
+  );
 
-      const isCurrent =
-        user?.cur_region.id === design.id;
+  const regions: DisplayRegion[] = useMemo(
+    () =>
+      regionDesigns.map((design) => {
+        const apiData =
+          regionMap.get(design.id) ?? null;
 
-      let status: DisplayRegion['status'] = 'locked';
-      let requirement = '잠긴 지역';
+        const isCurrent =
+          user?.cur_region.id === design.id;
 
-      if (isCurrent) {
-        status = 'current';
-        requirement = '현재 지역';
-      } else if (apiData?.status === 'UNLOCKED') {
-        status = 'unlocked';
-        requirement = '해금 완료';
-      } else if (apiData?.status === 'LOCKED') {
-        status = 'locked';
+        const status = getRegionStatus(
+          apiData,
+          isCurrent,
+        );
 
-        if (apiData.unlock) {
-          const {
-            specialty_name,
-            current_pieces,
-            required_pieces,
-          } = apiData.unlock;
-
-          requirement =
-            `${specialty_name} 조각 ` +
-            `${current_pieces}/${required_pieces}개`;
-        }
-      }
-
-      return {
-        ...design,
-        apiData,
-        status,
-        requirement,
-      };
-    });
+        return {
+          ...design,
+          apiData,
+          status,
+          requirement: getRegionRequirement(
+            apiData,
+            status,
+          ),
+        };
+      }),
+    [regionMap, user],
+  );
 
   const currentId = user?.cur_region.id ?? 1;
 
@@ -256,7 +315,7 @@ export default function ExplorePage({
     selectedRegion.status === 'locked';
 
   // ========================================
-  // 지역 선택
+  // Region Navigation
   // ========================================
 
   function handleRegionSelect() {
@@ -264,23 +323,20 @@ export default function ExplorePage({
 
     const regionId = selectedRegion.id;
 
-    if (regionId !== 1 && regionId !== 2) {
+    if (!selectedRegion.apiData) {
       setNotice(
-        'MVP에서 아직 지원하지 않는 지역이에요.',
+        '아직 탐험할 수 없는 지역이에요.',
       );
       return;
     }
 
     setNotice('');
 
-    // 현재 지역은 기존 게임 화면으로 이동
     if (isCurrent) {
       onStartExplore();
       return;
     }
 
-    // 다른 지역은 잠금 여부와 관계없이
-    // 지역 정보 화면에서 조건을 확인
     onOpenRegionInfo(regionId);
   }
 
@@ -291,16 +347,14 @@ export default function ExplorePage({
   return (
     <main className="explore-page">
       <div className="explore-page__content">
-        {/* 배경 */}
-
+        {/* Background */}
         <img
           className="explore-page__background"
           src={mapBackground}
           alt=""
         />
 
-        {/* 상단 정보 */}
-
+        {/* Header */}
         <header className="explore-header">
           <div className="explore-header__profile">
             <img src={profileImage} alt="" />
@@ -377,8 +431,7 @@ export default function ExplorePage({
           </button>
         </header>
 
-        {/* 탐험 지도 제목 */}
-
+        {/* Map Title */}
         <div className="explore-title">
           <div className="explore-title__inner" />
 
@@ -390,8 +443,7 @@ export default function ExplorePage({
           <h1>탐험 지도</h1>
         </div>
 
-        {/* 탐험 지도 */}
-
+        {/* Region Map */}
         <section
           className="explore-map"
           aria-label="경북 탐험 지도"
@@ -493,8 +545,7 @@ export default function ExplorePage({
           })}
         </section>
 
-        {/* 선택 지역 정보 */}
-
+        {/* Selected Region Detail */}
         <section
           className="explore-detail"
           aria-label="선택 지역 정보"
@@ -543,8 +594,7 @@ export default function ExplorePage({
           </div>
         </section>
 
-        {/* 알림 */}
-
+        {/* Notice */}
         {notice && (
           <div
             className="explore-notice"
@@ -563,8 +613,7 @@ export default function ExplorePage({
         )}
       </div>
 
-      {/* 공통 게임 메뉴 */}
-
+      {/* Shared Game Menu */}
       {menuOpen && (
         <GameMenu
           onClose={() =>

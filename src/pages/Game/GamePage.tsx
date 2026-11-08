@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from 'react';
 
 import {
@@ -14,6 +13,7 @@ import GameMenu from '../../components/GameMenu/GameMenu';
 import RewardModal from '../../components/RewardModal/RewardModal';
 
 import appleImage from '../../assets/explore/apple.png';
+import mackerelImage from '../../assets/explore/mackerel.png';
 import goldImage from '../../assets/explore/gold.png';
 import profileImage from '../../assets/explore/profile.png';
 import menuImage from '../../assets/explore/menu.png';
@@ -27,17 +27,18 @@ interface GamePageProps {
 }
 
 const MAX_SECONDS = 8 * 60 * 60;
+const REFRESH_INTERVAL = 15000;
 
 function formatTime(seconds: number): string {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const remainingSeconds = seconds % 60;
+  const safe = Math.max(0, Math.floor(seconds));
 
-  return [
-    String(hours).padStart(2, '0'),
-    String(minutes).padStart(2, '0'),
-    String(remainingSeconds).padStart(2, '0'),
-  ].join(':');
+  const hours = Math.floor(safe / 3600);
+  const minutes = Math.floor((safe % 3600) / 60);
+  const remaining = safe % 60;
+
+  return [hours, minutes, remaining]
+    .map((value) => String(value).padStart(2, '0'))
+    .join(':');
 }
 
 function errorText(error: unknown): string {
@@ -50,20 +51,15 @@ export default function GamePage({
   onOpenMap,
   onOpenQuiz,
 }: GamePageProps) {
-  const [user, setUser] =
-    useState<ExploreUser | null>(null);
-
-  const [regions, setRegions] =
-    useState<ExploreRegion[]>([]);
-
+  const [user, setUser] = useState<ExploreUser | null>(null);
+  const [regions, setRegions] = useState<ExploreRegion[]>([]);
   const [reward, setReward] =
     useState<IdleRewardPreview | null>(null);
 
   const [seconds, setSeconds] = useState(0);
-
   const [speed, setSpeed] = useState<1 | 2>(1);
-  const [menuOpen, setMenuOpen] = useState(false);
 
+  const [menuOpen, setMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [claiming, setClaiming] = useState(false);
 
@@ -75,9 +71,16 @@ export default function GamePage({
   const serverOffset = useRef(0);
   const pendingKey = useRef<string | null>(null);
   const inFlight = useRef(false);
-  const mounted = useRef(true);
+  const mounted = useRef(false);
+  const requestVersion = useRef(0);
+
+  // ========================================
+  // API Data Loading
+  // ========================================
 
   async function loadData() {
+    const version = ++requestVersion.current;
+
     const [userData, rewardData, regionData] =
       await Promise.all([
         exploreApi.getUser(),
@@ -85,10 +88,18 @@ export default function GamePage({
         exploreApi.getRegions(),
       ]);
 
-    if (!mounted.current) return;
+    if (
+      !mounted.current ||
+      version !== requestVersion.current
+    ) {
+      return;
+    }
 
-    serverOffset.current =
-      Date.parse(rewardData.server_time) - Date.now();
+    const serverTime = Date.parse(rewardData.server_time);
+
+    if (Number.isFinite(serverTime)) {
+      serverOffset.current = serverTime - Date.now();
+    }
 
     setUser(userData);
     setReward(rewardData);
@@ -107,13 +118,20 @@ export default function GamePage({
         );
       })
       .finally(() => {
-        if (mounted.current) setLoading(false);
+        if (mounted.current) {
+          setLoading(false);
+        }
       });
 
     return () => {
       mounted.current = false;
+      requestVersion.current += 1;
     };
   }, []);
+
+  // ========================================
+  // Timer
+  // ========================================
 
   useEffect(() => {
     if (!user) return;
@@ -136,36 +154,63 @@ export default function GamePage({
 
     const timer = window.setInterval(update, 1000);
 
-    return () => {
-      window.clearInterval(timer);
-    };
+    return () => window.clearInterval(timer);
   }, [user]);
+
+  // ========================================
+  // Reward Preview Refresh
+  // ========================================
 
   useEffect(() => {
     if (!user) return;
 
+    let cancelled = false;
+    let refreshing = false;
+
     const timer = window.setInterval(() => {
-      if (inFlight.current) return;
+      if (inFlight.current || refreshing) return;
+
+      refreshing = true;
+      const version = requestVersion.current;
 
       void exploreApi
         .getIdleReward()
         .then((data) => {
-          if (!mounted.current) return;
+          if (
+            cancelled ||
+            !mounted.current ||
+            inFlight.current ||
+            version !== requestVersion.current
+          ) {
+            return;
+          }
 
-          serverOffset.current =
-            Date.parse(data.server_time) - Date.now();
+          const serverTime = Date.parse(data.server_time);
+
+          if (Number.isFinite(serverTime)) {
+            serverOffset.current =
+              serverTime - Date.now();
+          }
 
           setReward(data);
         })
         .catch(() => {
-          // 다음 갱신에서 재시도
+          // 다음 갱신 주기에 재시도
+        })
+        .finally(() => {
+          refreshing = false;
         });
-    }, 15000);
+    }, REFRESH_INTERVAL);
 
     return () => {
+      cancelled = true;
       window.clearInterval(timer);
     };
   }, [user]);
+
+  // ========================================
+  // Derived Data
+  // ========================================
 
   const currentRegion = regions.find(
     (region) => region.id === user?.cur_region.id,
@@ -173,18 +218,29 @@ export default function GamePage({
 
   const pieces = currentRegion?.specialty.pieces ?? 0;
 
+  const currentRegionImage =
+    user?.cur_region.id === 2
+      ? mackerelImage
+      : appleImage;
+
+  const capSeconds = reward?.cap_seconds || MAX_SECONDS;
+
   const progress = Math.min(
     100,
-    (seconds / (reward?.cap_seconds || MAX_SECONDS)) * 100,
+    (seconds / capSeconds) * 100,
   );
 
+  // 서버가 수령 가능 여부를 최종 판단
   const canClaim =
     !!user &&
     !!reward &&
     !loading &&
     !claiming &&
-    seconds >= 60 &&
     reward.claimable;
+
+  // ========================================
+  // Claim Idle Reward
+  // ========================================
 
   async function handleClaim() {
     if (!canClaim || inFlight.current) return;
@@ -201,6 +257,8 @@ export default function GamePage({
     try {
       const claim = await exploreApi.claimIdleReward(key);
 
+      // 보상 수령 성공 후 이전 미리보기 요청 무효화
+      requestVersion.current += 1;
       pendingKey.current = null;
 
       if (!mounted.current) return;
@@ -231,6 +289,10 @@ export default function GamePage({
     }
   }
 
+  // ========================================
+  // Render
+  // ========================================
+
   return (
     <main className="game-page">
       <div className="game-page__container">
@@ -251,7 +313,7 @@ export default function GamePage({
             </span>
 
             <strong>
-              <img src={appleImage} alt="" />
+              <img src={currentRegionImage} alt="" />
               {user?.cur_region.name ?? '불러오는 중'}
             </strong>
           </div>
@@ -268,14 +330,13 @@ export default function GamePage({
             className="game-speed-button"
             type="button"
             aria-label={`현재 ${speed}배속, 배속 변경`}
-            onClick={() => {
-              setSpeed((prev) => (prev === 1 ? 2 : 1));
-            }}
+            onClick={() =>
+              setSpeed((prev) => (prev === 1 ? 2 : 1))
+            }
           >
             <span className="game-speed-button__icon">
               ▶
             </span>
-
             <span>{speed}배속</span>
           </button>
 
@@ -284,9 +345,9 @@ export default function GamePage({
             type="button"
             aria-label="메뉴"
             aria-expanded={menuOpen}
-            onClick={() => {
-              setMenuOpen((prev) => !prev);
-            }}
+            onClick={() =>
+              setMenuOpen((prev) => !prev)
+            }
           >
             <img src={menuImage} alt="" />
           </button>
@@ -298,9 +359,11 @@ export default function GamePage({
           aria-label="자동 탐험 게임"
         >
           <GameScene
-            speed={speed}
-            collectedPieces={pieces}
-          />
+  speed={speed}
+  collectedPieces={pieces}
+  regionId={user?.cur_region.id ?? 1}
+  specialtyName={currentRegion?.specialty.name}
+/>
         </section>
 
         {/* Idle Reward */}
@@ -335,31 +398,25 @@ export default function GamePage({
           <div className="game-rewards__bottom">
             <div className="game-rewards__item">
               <img src={goldImage} alt="" />
-
               <strong>
                 {reward?.gold.toLocaleString() ?? '—'}
               </strong>
-
               <small>예상 골드</small>
             </div>
 
             <div className="game-rewards__item">
               <img src="/game/exp.png" alt="" />
-
               <strong>
                 {reward?.exp.toLocaleString() ?? '—'}
               </strong>
-
               <small>예상 경험치</small>
             </div>
 
             <div className="game-rewards__item">
-              <img src={appleImage} alt="" />
-
+              <img src={currentRegionImage} alt="" />
               <strong>
                 {reward?.mobs_defeated.toLocaleString() ?? '—'}
               </strong>
-
               <small>처치한 몬스터</small>
             </div>
 
@@ -367,9 +424,7 @@ export default function GamePage({
               className="game-rewards__claim"
               type="button"
               disabled={!canClaim}
-              onClick={() => {
-                void handleClaim();
-              }}
+              onClick={() => void handleClaim()}
             >
               {claiming
                 ? '수령 중...'
@@ -410,9 +465,7 @@ export default function GamePage({
 
             <button
               type="button"
-              onClick={() => {
-                setMessage('');
-              }}
+              onClick={() => setMessage('')}
               aria-label="알림 닫기"
             >
               ×
@@ -424,11 +477,11 @@ export default function GamePage({
       {/* Game Menu */}
       {menuOpen && (
         <GameMenu
-  onClose={() => setMenuOpen(false)}
-  onOpenMap={onOpenMap}
-  onOpenQuiz={onOpenQuiz}
-  onNotice={setMessage}
-/>
+          onClose={() => setMenuOpen(false)}
+          onOpenMap={onOpenMap}
+          onOpenQuiz={onOpenQuiz}
+          onNotice={setMessage}
+        />
       )}
     </main>
   );
