@@ -293,173 +293,187 @@ export default function GamePage({
 
   return (
     <main className="game-page">
-      <div className="game-page__container">
-        {/* 공통 헤더 */}
-        <GameHeader
-          variant="game"
-          user={user}
-          regionImage={currentRegionImage}
-          regionName={
-            user?.cur_region.name ?? '불러오는 중'
-          }
-          menuOpen={menuOpen}
-          onOpenMenu={() =>
-            setMenuOpen((prev) => !prev)
-          }
-          onAddGold={() =>
-            setMessage(
-              '골드 충전 기능은 준비 중이에요.',
-            )
-          }
-        >
-          {/* 게임 화면 전용 배속 버튼 */}
-          <button
-            className="game-speed-button"
-            type="button"
-            aria-label={`현재 ${speed}배속, 배속 변경`}
-            onClick={() =>
-              setSpeed((prev) =>
-                prev === 1 ? 2 : 1,
+      <div
+        className="game-page__container"
+        style={
+          {
+            '--game-speed': speed,
+          } as React.CSSProperties
+        }
+      >
+        {/* 전체 화면 스크롤 배경 */}
+        <div
+          className="game-page__background"
+          aria-hidden="true"
+        />
+
+        {/* 실제 게임 콘텐츠 */}
+        <div className="game-page__content">
+          <GameHeader
+            variant="game"
+            user={user}
+            regionImage={currentRegionImage}
+            regionName={
+              user?.cur_region.name ?? '불러오는 중'
+            }
+            menuOpen={menuOpen}
+            onOpenMenu={() =>
+              setMenuOpen((prev) => !prev)
+            }
+            onAddGold={() =>
+              setMessage(
+                '골드 충전 기능은 준비 중이에요.',
               )
             }
           >
-            <span className="game-speed-button__icon">
-              ▶
-            </span>
-            <span>{speed}배속</span>
-          </button>
-        </GameHeader>
-
-        {/* Game Scene */}
-        <section
-          className="game-scene"
-          aria-label="자동 탐험 게임"
-        >
-          <GameScene
-            speed={speed}
-            collectedPieces={pieces}
-            regionId={user?.cur_region.id ?? 1}
-            specialtyName={currentRegion?.specialty.name}
-          />
-        </section>
-
-        {/* Idle Reward */}
-        <section className="game-rewards">
-          <div className="game-rewards__header">
-            <div className="game-rewards__title">
-              <img
-                src={treasureIcon}
-                alt=""
-                className="game-rewards__treasure"
-              />
-              <h2>쌓인 보상</h2>
-            </div>
-
-            <div className="game-rewards__timer">
-              <div className="game-rewards__time">
-                <span>
-                  {formatTime(seconds)}
-                  {' / 최대 8시간'}
-                </span>
-              </div>
-
-              <div className="game-rewards__track">
-                <div
-                  className="game-rewards__progress"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="game-rewards__bottom">
-            <div className="game-rewards__item">
-              <img src={goldImage} alt="" />
-              <strong>
-                {reward?.gold.toLocaleString() ?? '—'}
-              </strong>
-              <small>예상 골드</small>
-            </div>
-
-            <div className="game-rewards__item">
-              <img src="/game/exp.png" alt="" />
-              <strong>
-                {reward?.exp.toLocaleString() ?? '—'}
-              </strong>
-              <small>예상 경험치</small>
-            </div>
-
-            <div className="game-rewards__item">
-              <img src={currentRegionImage} alt="" />
-              <strong>
-                {reward?.mobs_defeated.toLocaleString() ?? '—'}
-              </strong>
-              <small>처치한 몬스터</small>
-            </div>
-
             <button
-              className="game-rewards__claim"
+              className="game-speed-button"
               type="button"
-              disabled={!canClaim}
-              onClick={() => void handleClaim()}
+              aria-label={`현재 ${speed}배속, 배속 변경`}
+              onClick={() =>
+                setSpeed((prev) =>
+                  prev === 1 ? 2 : 1,
+                )
+              }
             >
-              {claiming
-                ? '수령 중...'
-                : loading
-                  ? '로딩 중'
-                  : canClaim
-                    ? '보상 수령'
-                    : '탐험 중'}
+              <span className="game-speed-button__icon">
+                ▶
+              </span>
+              <span>{speed}배속</span>
             </button>
-          </div>
-        </section>
+          </GameHeader>
 
-        {/* Claim Result */}
-        {result && (
-          <RewardModal
-            gold={result.gained.gold}
-            exp={result.gained.exp}
-            pieces={result.gained.pieces.gained}
-            totalGold={result.gold}
-            currentExp={result.exp}
-            totalPieces={result.gained.pieces.total}
-            explorationSeconds={
-              result.gained.elapsed_seconds
-            }
-            specialtyName={
-              result.gained.pieces.name
-            }
-            dropRateBp={
-              result.gained.pieces.drop_rate_bp
-            }
-            mobsDefeated={
-              result.gained.mobs_defeated
-            }
-            onClose={() => {
-              setResult(null);
-              onOpenMap();
-            }}
-            onContinue={() => setResult(null)}
-          />
-        )}
-
-        {/* Notice */}
-        {message && (
-          <div
-            className="game-notice"
-            role="status"
+          {/* Game Scene */}
+          <section
+            className="game-scene"
+            aria-label="자동 탐험 게임"
           >
-            {message}
+            <GameScene
+              speed={speed}
+              collectedPieces={pieces}
+              regionId={user?.cur_region.id ?? 1}
+              specialtyName={currentRegion?.specialty.name}
+            />
+          </section>
 
-            <button
-              type="button"
-              onClick={() => setMessage('')}
-              aria-label="알림 닫기"
+          {/* Idle Reward */}
+          <section className="game-rewards">
+            <div className="game-rewards__header">
+              <div className="game-rewards__title">
+                <img
+                  src={treasureIcon}
+                  alt=""
+                  className="game-rewards__treasure"
+                />
+                <h2>쌓인 보상</h2>
+              </div>
+
+              <div className="game-rewards__timer">
+                <div className="game-rewards__time">
+                  <span>
+                    {formatTime(seconds)}
+                    {' / 최대 8시간'}
+                  </span>
+                </div>
+
+                <div className="game-rewards__track">
+                  <div
+                    className="game-rewards__progress"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="game-rewards__bottom">
+              <div className="game-rewards__item">
+                <img src={goldImage} alt="" />
+                <strong>
+                  {reward?.gold.toLocaleString() ?? '—'}
+                </strong>
+                <small>예상 골드</small>
+              </div>
+
+              <div className="game-rewards__item">
+                <img src="/game/exp.png" alt="" />
+                <strong>
+                  {reward?.exp.toLocaleString() ?? '—'}
+                </strong>
+                <small>예상 경험치</small>
+              </div>
+
+              <div className="game-rewards__item">
+                <img src={currentRegionImage} alt="" />
+                <strong>
+                  {reward?.mobs_defeated.toLocaleString() ?? '—'}
+                </strong>
+                <small>처치한 몬스터</small>
+              </div>
+
+              <button
+                className="game-rewards__claim"
+                type="button"
+                disabled={!canClaim}
+                onClick={() => void handleClaim()}
+              >
+                {claiming
+                  ? '수령 중...'
+                  : loading
+                    ? '로딩 중'
+                    : canClaim
+                      ? '보상 수령'
+                      : '탐험 중'}
+              </button>
+            </div>
+          </section>
+
+          {/* Claim Result */}
+          {result && (
+            <RewardModal
+              gold={result.gained.gold}
+              exp={result.gained.exp}
+              pieces={result.gained.pieces.gained}
+              totalGold={result.gold}
+              currentExp={result.exp}
+              totalPieces={result.gained.pieces.total}
+              explorationSeconds={
+                result.gained.elapsed_seconds
+              }
+              specialtyName={
+                result.gained.pieces.name
+              }
+              dropRateBp={
+                result.gained.pieces.drop_rate_bp
+              }
+              mobsDefeated={
+                result.gained.mobs_defeated
+              }
+              onClose={() => {
+                setResult(null);
+                onOpenMap();
+              }}
+              onContinue={() => setResult(null)}
+            />
+          )}
+
+          {/* Notice */}
+          {message && (
+            <div
+              className="game-notice"
+              role="status"
             >
-              ×
-            </button>
-          </div>
-        )}
+              {message}
+
+              <button
+                type="button"
+                onClick={() => setMessage('')}
+                aria-label="알림 닫기"
+              >
+                ×
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Game Menu */}

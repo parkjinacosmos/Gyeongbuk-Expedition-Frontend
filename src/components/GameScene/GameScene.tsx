@@ -277,7 +277,19 @@ export default function GameScene({
           releasePointer(event.pointerId);
         }}
       >
-        {/* Monsters */}
+        {/* ========================================
+            Scrolling Game Background
+        ======================================== */}
+
+        <div
+          className="runner-game__background"
+          aria-hidden="true"
+        />
+
+        {/* ========================================
+            Monsters
+        ======================================== */}
+
         {monsters.map((monster) => {
           const isDying =
             monster.status === 'dying';
@@ -336,7 +348,10 @@ export default function GameScene({
           );
         })}
 
-        {/* Player */}
+        {/* ========================================
+            Player
+        ======================================== */}
+
         <div
           className="runner-game__player"
           style={{
@@ -351,7 +366,10 @@ export default function GameScene({
           />
         </div>
 
-        {/* Collected Pieces */}
+        {/* ========================================
+            Collected Pieces
+        ======================================== */}
+
         <div className="runner-game__pieces">
           <img src={monsterImage} alt="" />
 
