@@ -1,11 +1,15 @@
-import type {
-  AppleOption,
-  Orchard,
-} from '../shopMock';
+import { useState } from 'react';
 
+import type { AppleOption, Orchard } from '../shopMock';
 import { formatShopPrice } from '../shopMock';
 
-import appleBasketImage from '../../../assets/shop/orchard-apple-basket.png';
+import farmImage from '../../../assets/shop/farm.png';
+import appleBasketImage from '../../../assets/shop/apple-basket.png';
+import apple1kgImage from '../../../assets/shop/apple-1kg.png';
+import apple2kgImage from '../../../assets/shop/apple-2kg.png';
+import apple5kgImage from '../../../assets/shop/apple-5kg.png';
+import giftWrapImage from '../../../assets/shop/gift-wrap.png';
+import receiptImage from '../../../assets/shop/receipt.png';
 
 interface OptionSelectionProps {
   orchard: Orchard;
@@ -18,121 +22,153 @@ interface OptionSelectionProps {
   onBack: () => void;
 }
 
+const optionImages: Record<string, string> = {
+  small: apple1kgImage,
+  medium: apple2kgImage,
+  large: apple5kgImage,
+};
+
 export default function OptionSelection({
   orchard,
   options,
   selectedOptionId,
-  quantity,
   onOptionChange,
-  onQuantityChange,
   onNext,
   onBack,
 }: OptionSelectionProps) {
+  const [giftWrapping, setGiftWrapping] = useState(true);
+
   const selectedOption = options.find(
     (option) => option.id === selectedOptionId,
   );
 
-  const totalPrice =
-    (orchard.price + (selectedOption?.additionalPrice ?? 0)) *
-    quantity;
+  const productPrice = selectedOption?.additionalPrice ?? 0;
+  const wrappingPrice = giftWrapping ? 2000 : 0;
+  const totalPrice = productPrice + wrappingPrice;
 
   return (
-    <section className="shop-flow" aria-label="옵션 선택">
-      <div className="shop-flow__steps">
-        <span className="shop-flow__step">
-          과수원 선택
-        </span>
-        <span className="shop-flow__arrow">›</span>
-        <span className="shop-flow__step shop-flow__step--active">
-          옵션 선택
-        </span>
-        <span className="shop-flow__arrow">›</span>
-        <span className="shop-flow__step">
-          배송 정보
-        </span>
+    <section
+      className="shop-flow shop-option"
+      aria-label="옵션 선택"
+    >
+      {/* 선택한 과수원 */}
+      <div className="shop-option__farm shop-option__panel">
+        <img
+          className="shop-option__farm-image"
+          src={farmImage}
+          alt="사과 과수원"
+        />
+
+        <div className="shop-option__farm-info">
+          <h2>{orchard.name}</h2>
+          <p>{orchard.description}</p>
+        </div>
       </div>
 
-      <div className="shop-flow__panel">
-        <div className="shop-flow__product">
-          <img src={appleBasketImage} alt="사과 바구니" />
+      {/* 용량 선택 */}
+      <div className="shop-option__panel shop-option__capacity">
+        <div className="shop-option__heading">
+          <img src={appleBasketImage} alt="" />
+          <h2>용량 선택</h2>
+        </div>
+
+        <div className="shop-option__capacity-list">
+          {options.map((option) => {
+            const isSelected = selectedOptionId === option.id;
+
+            return (
+              <label
+                key={option.id}
+                className={`shop-option__capacity-card ${
+                  isSelected
+                    ? 'shop-option__capacity-card--selected'
+                    : ''
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="apple-capacity"
+                  value={option.id}
+                  checked={isSelected}
+                  onChange={() => onOptionChange(option.id)}
+                />
+
+                <span className="shop-option__radio" />
+
+                <div className="shop-option__capacity-top">
+                  <img
+                    src={optionImages[option.id] ?? appleBasketImage}
+                    alt=""
+                  />
+                  <strong>{option.weight.toUpperCase()}</strong>
+                </div>
+
+                <span className="shop-option__capacity-price">
+                  {option.additionalPrice.toLocaleString('ko-KR')}
+                </span>
+              </label>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 포장 옵션 */}
+      <div className="shop-option__panel shop-option__wrapping">
+        <div className="shop-option__heading">
+          <img src={giftWrapImage} alt="" />
+          <h2>포장 옵션</h2>
+        </div>
+
+        <div className="shop-option__wrapping-row">
+          <span>선물 포장 추가</span>
+          <strong>+2,000</strong>
+
+          <button
+            type="button"
+            className={`shop-option__toggle ${
+              giftWrapping ? 'shop-option__toggle--active' : ''
+            }`}
+            role="switch"
+            aria-checked={giftWrapping}
+            aria-label="선물 포장 추가"
+            onClick={() => setGiftWrapping((prev) => !prev)}
+          >
+            <span />
+          </button>
+        </div>
+      </div>
+
+      {/* 결제 금액 */}
+      <div className="shop-option__panel shop-option__payment">
+        <div className="shop-option__heading">
+          <img src={receiptImage} alt="" />
+          <h2>결제 금액</h2>
+        </div>
+
+        <div className="shop-option__payment-details">
           <div>
-            <h2>{orchard.name}</h2>
-            <p>청송 사과 바구니</p>
-            <strong>{formatShopPrice(orchard.price)}부터</strong>
+            <span>상품 금액</span>
+            <strong>{formatShopPrice(productPrice)}</strong>
+          </div>
+
+          <div>
+            <span>포장비</span>
+            <strong>{formatShopPrice(wrappingPrice)}</strong>
           </div>
         </div>
 
-        <h3>상품 옵션 선택</h3>
-
-        <div className="shop-flow__options">
-          {options.map((option) => (
-            <label
-              className={`shop-flow__option ${
-                selectedOptionId === option.id
-                  ? 'shop-flow__option--selected'
-                  : ''
-              }`}
-              key={option.id}
-            >
-              <input
-                type="radio"
-                name="apple-option"
-                value={option.id}
-                checked={selectedOptionId === option.id}
-                onChange={() => onOptionChange(option.id)}
-              />
-              <span>
-                {option.label} ({option.weight})
-              </span>
-              <strong>
-                +{formatShopPrice(option.additionalPrice)}
-              </strong>
-            </label>
-          ))}
-        </div>
-
-        <div className="shop-flow__quantity">
-          <span>수량</span>
-
-          <div className="shop-flow__counter">
-            <button
-              type="button"
-              aria-label="수량 감소"
-              disabled={quantity <= 1}
-              onClick={() =>
-                onQuantityChange(Math.max(1, quantity - 1))
-              }
-            >
-              −
-            </button>
-
-            <strong>{quantity}</strong>
-
-            <button
-              type="button"
-              aria-label="수량 증가"
-              disabled={quantity >= 10}
-              onClick={() =>
-                onQuantityChange(Math.min(10, quantity + 1))
-              }
-            >
-              +
-            </button>
-          </div>
-        </div>
-
-        <div className="shop-flow__total">
-          <span>총 상품 금액</span>
+        <div className="shop-option__payment-total">
+          <span>총 결제금액</span>
           <strong>{formatShopPrice(totalPrice)}</strong>
         </div>
 
         <button
-          className="shop-flow__button shop-flow__button--full"
+          className="shop-option__purchase"
           type="button"
           disabled={!selectedOption}
           onClick={onNext}
         >
-          배송 정보 입력하기
+          구매하기
         </button>
       </div>
 

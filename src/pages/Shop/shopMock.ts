@@ -46,26 +46,28 @@ export const mockOrchards: Orchard[] = [
   },
 ];
 
+
 export const mockOptions: AppleOption[] = [
   {
     id: 'small',
-    label: '소형 사과',
-    weight: '3kg',
-    additionalPrice: 0,
+    label: '1KG',
+    weight: '1kg',
+    additionalPrice: 18000,
   },
   {
     id: 'medium',
-    label: '중형 사과',
-    weight: '5kg',
-    additionalPrice: 10000,
+    label: '2KG',
+    weight: '2kg',
+    additionalPrice: 32000,
   },
   {
     id: 'large',
-    label: '대형 사과',
-    weight: '10kg',
-    additionalPrice: 25000,
+    label: '5KG',
+    weight: '5kg',
+    additionalPrice: 18000,
   },
 ];
+
 
 export const initialDeliveryForm: DeliveryFormData = {
   recipient: '',
