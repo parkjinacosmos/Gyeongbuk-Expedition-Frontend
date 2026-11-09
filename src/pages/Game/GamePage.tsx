@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
   exploreApi,
@@ -18,6 +18,7 @@ import mackerelImage from '../../assets/explore/mackerel.png';
 import goldImage from '../../assets/explore/gold.png';
 import treasureIcon from '../../assets/explore/treasure.png';
 
+import { regionBackgroundStyle } from './regionBackgrounds';
 import './GamePage.css';
 
 interface GamePageProps {
@@ -27,6 +28,7 @@ interface GamePageProps {
 
 const MAX_SECONDS = 8 * 60 * 60;
 const REFRESH_INTERVAL = 15000;
+const BACKGROUND_LOOP_DURATION = 12000;
 
 function formatTime(seconds: number): string {
   const safe = Math.max(0, Math.floor(seconds));
@@ -67,6 +69,25 @@ export default function GamePage({
     useState<IdleRewardClaim | null>(null);
 
   const [message, setMessage] = useState('');
+
+  const backgroundTrackRef = useRef<HTMLDivElement>(null);
+  const backgroundElapsed = useRef(0);
+
+  const setBackgroundTrack = useCallback((track: HTMLDivElement | null) => {
+    backgroundTrackRef.current = track;
+    backgroundElapsed.current = 0;
+  }, []);
+
+  const scrollBackground = useCallback((elapsedAtSpeed: number) => {
+    const track = backgroundTrackRef.current;
+    if (!track) return;
+
+    backgroundElapsed.current =
+      (backgroundElapsed.current + elapsedAtSpeed) % BACKGROUND_LOOP_DURATION;
+    const progress = backgroundElapsed.current / BACKGROUND_LOOP_DURATION;
+    // The loop spans two of the track's three equal-width tiles.
+    track.style.transform = 'translate3d(' + (-progress * 200 / 3) + '%, 0, 0)';
+  }, []);
 
   const serverOffset = useRef(0);
   const pendingKey = useRef<string | null>(null);
@@ -212,9 +233,8 @@ export default function GamePage({
   // Derived Data
   // ========================================
 
-  const currentRegion = regions.find(
-    (region) => region.id === user?.cur_region.id,
-  );
+  const regionId = user?.cur_region.id ?? 1;
+  const currentRegion = regions.find((region) => region.id === regionId);
 
   const pieces = currentRegion?.specialty.pieces ?? 0;
 
@@ -293,19 +313,20 @@ export default function GamePage({
 
   return (
     <main className="game-page">
-      <div
-        className="game-page__container"
-        style={
-          {
-            '--game-speed': speed,
-          } as React.CSSProperties
-        }
-      >
-        {/* 전체 화면 스크롤 배경 */}
+      <div className="game-page__container">
         <div
           className="game-page__background"
+          style={regionBackgroundStyle(regionId)}
           aria-hidden="true"
-        />
+        >
+          {(user || !loading) && (
+            <div key={regionId} ref={setBackgroundTrack} className="game-page__background-track">
+              <div />
+              <div />
+              <div />
+            </div>
+          )}
+        </div>
 
         {/* 실제 게임 콘텐츠 */}
         <div className="game-page__content">
@@ -349,9 +370,11 @@ export default function GamePage({
             aria-label="자동 탐험 게임"
           >
             <GameScene
+              key={regionId}
               speed={speed}
+              onTravel={scrollBackground}
               collectedPieces={pieces}
-              regionId={user?.cur_region.id ?? 1}
+              regionId={regionId}
               specialtyName={currentRegion?.specialty.name}
             />
           </section>

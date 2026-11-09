@@ -37,39 +37,46 @@
 }
 
 /* ========================================
-   Full Screen Animated Background
+   Full Screen Background
 ======================================== */
 
 .game-page__background {
   position: absolute;
   z-index: -1;
-
   inset: 0;
-
-  width: 100%;
-  height: 100%;
-
-  background-image: url('/game/background.png');
-  background-repeat: repeat-x;
-  background-position: 0 top;
-  background-size: auto 100%;
-
-  animation: game-page-background-scroll
-    calc(12s / var(--game-speed, 1))
-    linear infinite;
-
+  overflow: hidden;
+  container-type: size;
+  --road-line: 386px;
+  background: linear-gradient(#7cccf5, #b9dca0 var(--road-line), #f9d5a0 var(--road-line), #b9dca0 75%);
   pointer-events: none;
-  will-change: background-position;
 }
 
-@keyframes game-page-background-scroll {
-  from {
-    background-position-x: 0;
-  }
+.game-page__background-track {
+  position: absolute;
+  /* Align both road edges while scaling the whole artwork proportionally. */
+  --road-depth: max(
+    100cqw * var(--road-per-width),
+    var(--road-line) * var(--road-per-upper),
+    (100cqh - var(--road-line)) * var(--road-per-lower)
+  );
+  --artwork-height: calc(var(--road-depth) / var(--artwork-road-depth));
+  top: calc(var(--road-line) - var(--artwork-height) * var(--artwork-road-start));
+  left: 0;
+  width: calc(3 * var(--artwork-height) * var(--artwork-ratio));
+  height: var(--artwork-height);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+}
 
-  to {
-    background-position-x: -800px;
-  }
+.game-page__background-track > div {
+  background: var(--region-background) center top / cover no-repeat;
+}
+
+.game-page__background-track > div:nth-child(2) {
+  /* The source edges differ, so join equal edges at each seam. */
+  transform: scaleX(-1);
 }
 
 /* ========================================
