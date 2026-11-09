@@ -7,8 +7,13 @@ import QuizPage from './pages/Quiz/QuizPage';
 import CharacterPage from './pages/Character/CharacterPage';
 import BookPage from './pages/Book/BookPage';
 import ShopPage from './pages/Shop/ShopPage';
+import ChatPage from './pages/Chat/ChatPage';
 
 import BottomNavigation from './components/BottomNavigation/BottomNavigation';
+import Onboarding from './components/Onboarding/Onboarding';
+
+import { hasSession, onSessionExpired } from './api/session';
+import { OPEN_CHAT_EVENT } from './api/chat';
 
 import type { NavigationItem } from './components/BottomNavigation/BottomNavigation';
 
@@ -126,6 +131,20 @@ function getSavedQuizReturn(): QuizReturnScreen {
 // ========================================
 
 export default function App() {
+  const [signedIn, setSignedIn] = useState(hasSession);
+
+  useEffect(() => onSessionExpired(() => setSignedIn(false)), []);
+
+  const [chatOpen, setChatOpen] = useState(false);
+
+  useEffect(() => {
+    const open = () => setChatOpen(true);
+
+    window.addEventListener(OPEN_CHAT_EVENT, open);
+
+    return () => window.removeEventListener(OPEN_CHAT_EVENT, open);
+  }, []);
+
   const [activeTab, setActiveTab] =
     useState<NavigationItem>(getSavedTab);
 
@@ -312,6 +331,22 @@ export default function App() {
   // ========================================
   // Render
   // ========================================
+
+  if (!signedIn) {
+    return <Onboarding onCreated={() => setSignedIn(true)} />;
+  }
+
+  if (chatOpen) {
+    return (
+      <ChatPage
+        onClose={() => setChatOpen(false)}
+        onOpenShop={() => {
+          setChatOpen(false);
+          setActiveTab('shop');
+        }}
+      />
+    );
+  }
 
   return (
     <>

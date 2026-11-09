@@ -243,8 +243,9 @@ export default function CharacterPage({
 
   const currentStage = equipment?.stage ?? 1;
 
-  const exp = user?.exp ?? 0;
-  const expMax = user?.exp_to_next_level ?? 0;
+  const exp = user?.level_exp ?? user?.exp ?? 0;
+  const expMax =
+    user?.level_exp_required ?? user?.exp_to_next_level ?? 0;
 
   const expPercent =
     expMax > 0

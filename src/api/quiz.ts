@@ -1,3 +1,4 @@
+import { clearSession } from './session';
 import { ApiError, exploreApi } from './explore';
 
 const API_BASE_URL =
@@ -357,7 +358,7 @@ async function request<T>(
     const error = await response.json().catch(() => null);
 
     if (response.status === 401) {
-      localStorage.removeItem('access_token');
+      clearSession();
     }
 
     throw new ApiError(
