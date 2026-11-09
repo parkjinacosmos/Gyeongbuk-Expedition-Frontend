@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import type { AppleOption, Orchard } from '../shopMock';
 import { formatShopPrice } from '../shopMock';
 
@@ -11,16 +9,26 @@ import apple5kgImage from '../../../assets/shop/apple-5kg.png';
 import giftWrapImage from '../../../assets/shop/gift-wrap.png';
 import receiptImage from '../../../assets/shop/receipt.png';
 
+// ========================================
+// Types
+// ========================================
+
 interface OptionSelectionProps {
   orchard: Orchard;
   options: AppleOption[];
   selectedOptionId: string;
   quantity: number;
+  giftWrapping: boolean;
   onOptionChange: (id: string) => void;
   onQuantityChange: (quantity: number) => void;
+  onGiftWrappingChange: (value: boolean) => void;
   onNext: () => void;
   onBack: () => void;
 }
+
+// ========================================
+// Images
+// ========================================
 
 const optionImages: Record<string, string> = {
   small: apple1kgImage,
@@ -28,22 +36,31 @@ const optionImages: Record<string, string> = {
   large: apple5kgImage,
 };
 
+// ========================================
+// Option Selection
+// ========================================
+
 export default function OptionSelection({
   orchard,
   options,
   selectedOptionId,
+  giftWrapping,
   onOptionChange,
+  onGiftWrappingChange,
   onNext,
   onBack,
 }: OptionSelectionProps) {
-  const [giftWrapping, setGiftWrapping] = useState(true);
-
   const selectedOption = options.find(
     (option) => option.id === selectedOptionId,
   );
 
+  // 옵션별 가격을 상품 가격으로 사용
   const productPrice = selectedOption?.additionalPrice ?? 0;
+
+  // 선물 포장 추가 비용
   const wrappingPrice = giftWrapping ? 2000 : 0;
+
+  // 총 결제 금액
   const totalPrice = productPrice + wrappingPrice;
 
   return (
@@ -51,7 +68,10 @@ export default function OptionSelection({
       className="shop-flow shop-option"
       aria-label="옵션 선택"
     >
-      {/* 선택한 과수원 */}
+      {/* ========================================
+          선택한 과수원
+      ======================================== */}
+
       <div className="shop-option__farm shop-option__panel">
         <img
           className="shop-option__farm-image"
@@ -65,7 +85,10 @@ export default function OptionSelection({
         </div>
       </div>
 
-      {/* 용량 선택 */}
+      {/* ========================================
+          용량 선택
+      ======================================== */}
+
       <div className="shop-option__panel shop-option__capacity">
         <div className="shop-option__heading">
           <img src={appleBasketImage} alt="" />
@@ -93,18 +116,27 @@ export default function OptionSelection({
                   onChange={() => onOptionChange(option.id)}
                 />
 
-                <span className="shop-option__radio" />
+                <span
+                  className="shop-option__radio"
+                  aria-hidden="true"
+                />
 
                 <div className="shop-option__capacity-top">
                   <img
-                    src={optionImages[option.id] ?? appleBasketImage}
+                    src={
+                      optionImages[option.id] ??
+                      appleBasketImage
+                    }
                     alt=""
                   />
-                  <strong>{option.weight.toUpperCase()}</strong>
+
+                  <strong>
+                    {option.weight.toUpperCase()}
+                  </strong>
                 </div>
 
                 <span className="shop-option__capacity-price">
-                  {option.additionalPrice.toLocaleString('ko-KR')}
+                  {formatShopPrice(option.additionalPrice)}
                 </span>
               </label>
             );
@@ -112,7 +144,10 @@ export default function OptionSelection({
         </div>
       </div>
 
-      {/* 포장 옵션 */}
+      {/* ========================================
+          포장 옵션
+      ======================================== */}
+
       <div className="shop-option__panel shop-option__wrapping">
         <div className="shop-option__heading">
           <img src={giftWrapImage} alt="" />
@@ -121,24 +156,32 @@ export default function OptionSelection({
 
         <div className="shop-option__wrapping-row">
           <span>선물 포장 추가</span>
-          <strong>+2,000</strong>
+
+          <strong>+2,000원</strong>
 
           <button
             type="button"
             className={`shop-option__toggle ${
-              giftWrapping ? 'shop-option__toggle--active' : ''
+              giftWrapping
+                ? 'shop-option__toggle--active'
+                : ''
             }`}
             role="switch"
             aria-checked={giftWrapping}
             aria-label="선물 포장 추가"
-            onClick={() => setGiftWrapping((prev) => !prev)}
+            onClick={() =>
+              onGiftWrappingChange(!giftWrapping)
+            }
           >
             <span />
           </button>
         </div>
       </div>
 
-      {/* 결제 금액 */}
+      {/* ========================================
+          결제 금액
+      ======================================== */}
+
       <div className="shop-option__panel shop-option__payment">
         <div className="shop-option__heading">
           <img src={receiptImage} alt="" />
@@ -148,18 +191,24 @@ export default function OptionSelection({
         <div className="shop-option__payment-details">
           <div>
             <span>상품 금액</span>
-            <strong>{formatShopPrice(productPrice)}</strong>
+            <strong>
+              {formatShopPrice(productPrice)}
+            </strong>
           </div>
 
           <div>
             <span>포장비</span>
-            <strong>{formatShopPrice(wrappingPrice)}</strong>
+            <strong>
+              {formatShopPrice(wrappingPrice)}
+            </strong>
           </div>
         </div>
 
         <div className="shop-option__payment-total">
           <span>총 결제금액</span>
-          <strong>{formatShopPrice(totalPrice)}</strong>
+          <strong>
+            {formatShopPrice(totalPrice)}
+          </strong>
         </div>
 
         <button
@@ -171,6 +220,10 @@ export default function OptionSelection({
           구매하기
         </button>
       </div>
+
+      {/* ========================================
+          이전 단계
+      ======================================== */}
 
       <button
         className="shop-flow__back"

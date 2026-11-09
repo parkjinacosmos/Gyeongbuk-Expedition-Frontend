@@ -98,6 +98,9 @@ export default function ShopPage() {
   // 수량
   const [quantity, setQuantity] = useState(1);
 
+  // 선물 포장 여부
+  const [giftWrapping, setGiftWrapping] = useState(true);
+
   // 배송 정보
   const [deliveryForm, setDeliveryForm] =
     useState<DeliveryFormData>({
@@ -181,6 +184,7 @@ export default function ShopPage() {
     setSelectedOrchard(null);
     setSelectedOptionId(mockOptions[0].id);
     setQuantity(1);
+    setGiftWrapping(true);
     setDeliveryForm({ ...initialDeliveryForm });
   }
 
@@ -235,6 +239,7 @@ export default function ShopPage() {
     setSelectedOrchard(orchard);
     setSelectedOptionId(mockOptions[0].id);
     setQuantity(1);
+    setGiftWrapping(true);
     setStep('option');
   }
 
@@ -285,18 +290,18 @@ export default function ShopPage() {
           />
         </div>
 
-        {/* 상점 제목 */}
+        {/* 현재 단계에 따른 제목 */}
         <div className="shop-page__title">
-  <h1>
-    {step === 'main'
-      ? '상점'
-      : step === 'orchard'
-        ? '과수원 선택'
-        : step === 'option'
-          ? '옵션 선택'
-          : '배송정보 입력'}
-  </h1>
-</div>
+          <h1>
+            {step === 'main'
+              ? '상점'
+              : step === 'orchard'
+                ? '과수원 선택'
+                : step === 'option'
+                  ? '옵션 선택'
+                  : '배송정보 입력'}
+          </h1>
+        </div>
 
         {/* ========================================
             상점 콘텐츠 통합 스크롤
@@ -403,8 +408,10 @@ export default function ShopPage() {
               options={mockOptions}
               selectedOptionId={selectedOptionId}
               quantity={quantity}
+              giftWrapping={giftWrapping}
               onOptionChange={setSelectedOptionId}
               onQuantityChange={setQuantity}
+              onGiftWrappingChange={setGiftWrapping}
               onNext={() => setStep('delivery')}
               onBack={() => setStep('orchard')}
             />
@@ -421,6 +428,7 @@ export default function ShopPage() {
                 orchard={selectedOrchard}
                 option={selectedOption}
                 quantity={quantity}
+                giftWrapping={giftWrapping}
                 form={deliveryForm}
                 onFormChange={setDeliveryForm}
                 onComplete={handleOrderComplete}
