@@ -547,3 +547,36 @@
 .quiz-hud__menu img {
   pointer-events: none;
 }
+
+/* ========================================
+   Quiz Header Alignment
+======================================== */
+
+.quiz-hud {
+  position: relative;
+  z-index: 10;
+  height: 115px;
+}
+
+.quiz-hud__profile {
+  top: 48px;
+  left: 12px;
+  align-items: center;
+}
+
+.quiz-hud__region {
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.quiz-hud__gold {
+  top: 48px;
+  right: 10px;
+}
+
+.quiz-hud__menu {
+  top: 100px;
+  right: 12px;
+  z-index: 11;
+}
