@@ -5,6 +5,7 @@ import GamePage from './pages/Game/GamePage';
 import RegionInfoPage from './pages/RegionInfo/RegionInfoPage';
 import QuizPage from './pages/Quiz/QuizPage';
 import CharacterPage from './pages/Character/CharacterPage';
+import BookPage from './pages/Book/BookPage';
 
 import BottomNavigation from './components/BottomNavigation/BottomNavigation';
 
@@ -33,11 +34,7 @@ const STORAGE_KEYS = {
 // Page Titles
 // ========================================
 
-const pageTitles: Record<
-  Exclude<NavigationItem, 'explore' | 'character'>,
-  string
-> = {
-  book: '도감',
+const pageTitles: Record<'shop', string> = {
   shop: '상점',
 };
 
@@ -187,8 +184,11 @@ export default function App() {
   };
 
   const openQuiz = () => {
-    if (activeTab === 'character') {
-      // 캐릭터 페이지에서 퀴즈 진입 시
+    if (
+      activeTab === 'character' ||
+      activeTab === 'book'
+    ) {
+      // 다른 탭에서 퀴즈 진입 시
       // 퀴즈 종료 후 탐험 지도로 돌아가기
       setQuizReturnScreen('map');
     } else if (exploreScreen !== 'quiz') {
@@ -263,7 +263,7 @@ export default function App() {
   };
 
   // ========================================
-  // Render Placeholder Screen
+  // Render Other Screens
   // ========================================
 
   const renderPlaceholderScreen = () => {
@@ -271,7 +271,6 @@ export default function App() {
       return null;
     }
 
-    // 캐릭터 페이지 및 메뉴 이동 연결
     if (activeTab === 'character') {
       return (
         <CharacterPage
@@ -281,7 +280,15 @@ export default function App() {
       );
     }
 
-    // 도감 및 상점은 기존 임시 화면 유지
+    if (activeTab === 'book') {
+      return (
+        <BookPage
+          onOpenMap={openMap}
+          onOpenQuiz={openQuiz}
+        />
+      );
+    }
+
     return (
       <main
         style={{

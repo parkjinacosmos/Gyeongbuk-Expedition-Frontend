@@ -1,0 +1,618 @@
+/* ========================================
+   Book Page
+======================================== */
+
+.book-page {
+  position: relative;
+  width: 100%;
+  max-width: 390px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: 0 8px 120px;
+  box-sizing: border-box;
+
+  color: #593719;
+  font-family:
+    'Pretendard Variable',
+    Pretendard,
+    sans-serif;
+
+  background-color: #a6dff8;
+  background-image: url('../../assets/book/background.png');
+  background-repeat: no-repeat;
+  background-position: center top;
+  background-size: 100% 100%;
+}
+
+.book-page *,
+.book-page *::before,
+.book-page *::after {
+  box-sizing: border-box;
+}
+
+.book-page__content {
+  position: relative;
+  z-index: 1;
+}
+
+/* ========================================
+   Shared Header
+======================================== */
+
+.book-page .game-header {
+  height: 84px;
+}
+
+.book-page .game-header__profile {
+  top: 32px;
+  left: 0;
+}
+
+.book-page .game-header__gold {
+  top: 32px;
+  right: 0;
+}
+
+.book-page .game-header__menu {
+  top: 72px;
+  right: 0;
+}
+
+/* ========================================
+   Sign
+======================================== */
+
+.book-page__sign {
+  position: relative;
+  z-index: 3;
+
+  display: grid;
+  place-items: center;
+
+  width: 190px;
+  height: 52px;
+  margin: 0 auto 13px;
+
+  border: 2px solid #9a6a35;
+  border-radius: 27px;
+
+  background: linear-gradient(
+    180deg,
+    #fff3d8 0%,
+    #f3cc91 100%
+  );
+
+  box-shadow: 0 3px 3px rgba(113, 80, 33, 0.19);
+}
+
+.book-page__sign::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+
+  border: 2px solid #fffef1;
+  border-radius: 23px;
+
+  pointer-events: none;
+}
+
+.book-page__sign span {
+  position: relative;
+
+  color: #593719;
+  font-size: 23px;
+  font-weight: 900;
+}
+
+/* ========================================
+   Figma Book Background
+======================================== */
+
+.book-page__panel {
+  position: relative;
+  isolation: isolate;
+
+  width: 100%;
+  max-width: 360px;
+  aspect-ratio: 390 / 540;
+
+  margin: 0 auto;
+  padding: 0;
+
+  border: 0;
+  background: transparent;
+
+  filter: drop-shadow(
+    0 5px 5px rgba(83, 52, 22, 0.17)
+  );
+}
+
+.book-page__background {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+
+  pointer-events: none;
+}
+
+.book-page__cover {
+  position: absolute;
+  inset: 0;
+
+  display: block;
+  width: 100%;
+  height: 100%;
+
+  object-fit: fill;
+}
+
+.book-page__paper {
+  position: absolute;
+
+  top: 1.3%;
+  left: 1.282%;
+
+  display: block;
+  width: 97.436%;
+  height: 97.407%;
+
+  object-fit: fill;
+}
+
+/* ========================================
+   Bookmark
+======================================== */
+
+.book-page__ribbon {
+  position: absolute;
+  z-index: 3;
+
+  top: 8px;
+  right: 37px;
+
+  width: 14px;
+  height: 29px;
+
+  background: #f37a73;
+
+  border-left: 3px solid #d9605c;
+  border-right: 1px solid #d9605c;
+
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% 100%,
+    50% 79%,
+    0 100%
+  );
+
+  filter: drop-shadow(
+    1px 2px 1px rgba(100, 55, 35, 0.2)
+  );
+
+  pointer-events: none;
+}
+
+/* ========================================
+   Inner Content
+======================================== */
+
+.book-page__inner {
+  position: absolute;
+  z-index: 1;
+
+  top: 7%;
+  right: 7%;
+  bottom: 7%;
+  left: 7%;
+
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+  min-height: 0;
+
+  overflow: visible;
+}
+
+/* ========================================
+   Heading
+======================================== */
+
+.book-page__heading {
+  flex-shrink: 0;
+
+  margin: 0 0 8px;
+
+  color: #674423;
+  font-size: 19px;
+  font-weight: 900;
+  line-height: 1.2;
+  text-align: center;
+}
+
+/* ========================================
+   Summary
+======================================== */
+
+.book-page__summary {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: space-between;
+  align-items: center;
+  gap: 5px;
+
+  margin-bottom: 8px;
+  padding: 0 3px;
+
+  color: #659845;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+/* ========================================
+   Specialty Grid
+======================================== */
+
+.book-page__grid {
+  display: grid;
+  flex: 1;
+  min-height: 0;
+
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+
+  gap: 8px 6px;
+  width: 100%;
+}
+
+/* ========================================
+   Specialty Card
+======================================== */
+
+.book-page__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  padding: 10px 2px 7px;
+
+  border: 1.5px solid #e1c59b;
+  border-radius: 11px;
+
+  background: linear-gradient(
+    180deg,
+    #fff9ec,
+    #f5e4c9
+  );
+
+  color: #69492c;
+  font-family: inherit;
+  cursor: pointer;
+
+  box-shadow: inset 0 2px 0 #fffdf6;
+}
+
+.book-page__item:disabled {
+  cursor: default;
+}
+
+.book-page__item.is-selected {
+  border: 2px solid #d8a13e;
+  background: #fff0bd;
+
+  box-shadow:
+    inset 0 0 0 1px #f8cf72,
+    0 2px 5px rgba(115, 78, 23, 0.12);
+}
+
+.book-page__item.is-locked {
+  background: #f1e5d1;
+}
+
+/* ========================================
+   State Badge
+======================================== */
+
+.book-page__item-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 14px;
+  max-width: 100%;
+  padding: 1px 5px;
+
+  border-radius: 9px;
+
+  background: #bfb09b;
+  color: #fffdf3;
+
+  font-size: 8px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.book-page__item:not(.is-locked)
+  .book-page__item-badge {
+  background: #89bd66;
+}
+
+/* ========================================
+   Image & Lock
+======================================== */
+
+.book-page__item-image {
+  position: relative;
+
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+  min-height: 0;
+  height: auto;
+  margin: 3px 0;
+}
+
+.book-page__item-image img {
+  width: 100%;
+  max-width: 51px;
+  height: 51px;
+  max-height: 100%;
+
+  object-fit: contain;
+}
+
+.book-page__item-image > span:not(.book-page__lock) {
+  color: #a8a095;
+  font-size: 25px;
+  font-weight: 900;
+}
+
+.book-page__item-image img.is-grayscale,
+.book-page__detail-image img.is-grayscale {
+  filter: grayscale(1) brightness(0.78);
+  opacity: 0.65;
+}
+
+.book-page__lock {
+  position: absolute;
+  right: 3px;
+  bottom: 2px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 19px;
+  height: 19px;
+
+  border: 1px solid #d0b99b;
+  border-radius: 50%;
+
+  background: #fff5df;
+  color: #a38a6b;
+
+  box-shadow: 0 1px 2px rgba(75, 48, 20, 0.12);
+}
+
+.book-page__lock svg {
+  display: block;
+  width: 13px;
+  height: 13px;
+}
+
+/* ========================================
+   Card Text
+======================================== */
+
+.book-page__item strong {
+  max-width: 100%;
+  margin: 0;
+
+  font-size: 9px;
+  font-weight: 900;
+  line-height: 1.2;
+
+  text-align: center;
+  word-break: keep-all;
+}
+
+.book-page__item small {
+  margin-top: 1px;
+
+  color: #a58d6c;
+  font-size: 8px;
+  line-height: 1.2;
+
+  text-align: center;
+}
+
+/* ========================================
+   Detail Panel
+======================================== */
+
+.book-page__detail {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 10px;
+
+  min-height: 96px;
+  margin-top: 9px;
+  padding: 10px;
+
+  border: 1.5px solid #e5b97d;
+  border-radius: 14px;
+
+  background: linear-gradient(
+    135deg,
+    #fffdf1,
+    #fff2d7
+  );
+
+  box-shadow: inset 0 2px 0 #fff;
+}
+
+.book-page__detail-image {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
+
+  width: 60px;
+  height: 65px;
+}
+
+.book-page__detail-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.book-page__detail-image > span {
+  color: #b5a28b;
+  font-size: 30px;
+}
+
+.book-page__detail-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.book-page__detail-content h2 {
+  margin: 0 0 1px;
+
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.book-page__detail-state {
+  color: #6ca44a;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.book-page__detail-content p {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+
+  margin: 4px 0;
+
+  font-size: 9px;
+  line-height: 1.35;
+  word-break: keep-all;
+}
+
+.book-page__detail-content small {
+  display: block;
+  margin-top: 2px;
+
+  color: #679a46;
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+/* ========================================
+   Loading & Error
+======================================== */
+
+.book-page__message {
+  padding: 24px 8px;
+  text-align: center;
+  font-size: 12px;
+}
+
+.book-page__message--error {
+  color: #c64e45;
+}
+
+/* ========================================
+   Notice
+======================================== */
+
+.book-page__notice {
+  position: fixed;
+  z-index: 120;
+
+  bottom: 115px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+
+  width: calc(100% - 32px);
+  max-width: 350px;
+  padding: 12px;
+
+  border: 2px solid #c99c62;
+  border-radius: 14px;
+
+  background: #fff7df;
+
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.book-page__notice button {
+  border: 0;
+  background: transparent;
+  color: #674324;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* ========================================
+   Small Screens
+======================================== */
+
+@media (max-width: 360px) {
+  .book-page__inner {
+    right: 7.5%;
+    left: 7.5%;
+  }
+
+  .book-page__grid {
+    gap: 6px 5px;
+  }
+
+  .book-page__item {
+    height: 100%;
+    min-height: 0;
+    padding: 7px 2px 5px;
+  }
+
+  .book-page__item-image {
+    height: auto;
+  }
+
+  .book-page__item-image img {
+    max-width: 45px;
+    height: 45px;
+  }
+
+  .book-page__detail {
+    min-height: 88px;
+    margin-top: 8px;
+    padding: 8px;
+  }
+
+  .book-page__ribbon {
+    right: 32px;
+  }
+}
