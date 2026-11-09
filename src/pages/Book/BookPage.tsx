@@ -158,7 +158,7 @@ export default function BookPage({
 }: BookPageProps) {
   const [user, setUser] = useState<ExploreUser | null>(null);
   const [items, setItems] = useState<CodexItem[]>([]);
-  const [summary, setSummary] =
+  const [, setSummary] =
     useState<CodexSummary | null>(null);
   const [regions, setRegions] = useState<ExploreRegion[]>([]);
 
