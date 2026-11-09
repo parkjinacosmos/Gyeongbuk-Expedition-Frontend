@@ -1,0 +1,1062 @@
+/* ========================================
+   Shop Page
+======================================== */
+
+.shop-page {
+  position: relative;
+  width: 100%;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  background: #a9d76a;
+  color: #593719;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.shop-page,
+.shop-page * {
+  box-sizing: border-box;
+}
+
+/* ========================================
+   Container
+======================================== */
+
+.shop-page__content {
+  position: relative;
+  width: 100%;
+  max-width: 402px;
+  height: 874px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+/* ========================================
+   Background
+======================================== */
+
+.shop-page__background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+
+  width: 100%;
+  height: 874px;
+  object-fit: cover;
+  object-position: center top;
+
+  pointer-events: none;
+}
+
+/* ========================================
+   Shared Header
+======================================== */
+
+.shop-page__header {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+}
+
+/* ========================================
+   Wooden Title Sign
+   Figma: x109, y154, 184×61
+======================================== */
+
+.shop-page__title {
+  position: absolute;
+  z-index: 4;
+
+  top: 154px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 184px;
+  height: 61px;
+
+  border: 2px solid #9a6a35;
+  border-radius: 27px;
+
+  background: linear-gradient(
+    180deg,
+    #fff3d8 0%,
+    #f3cc91 100%
+  );
+
+  box-shadow: 0 3px 3px rgba(113, 80, 33, 0.19);
+}
+
+.shop-page__title::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+
+  border: 2px solid #fffef1;
+  border-radius: 23px;
+  pointer-events: none;
+}
+
+.shop-page__title h1 {
+  position: relative;
+  z-index: 1;
+
+  margin: 0;
+  color: #593719;
+
+  font-size: 26px;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.shop-page__title-leaf {
+  position: absolute;
+  z-index: 2;
+  font-size: 19px;
+  line-height: 1;
+}
+
+.shop-page__title-leaf--left {
+  left: -10px;
+  bottom: 7px;
+  transform: rotate(-30deg);
+}
+
+.shop-page__title-leaf--right {
+  right: -10px;
+  top: 14px;
+  transform: rotate(30deg) scaleX(-1);
+}
+
+/* ========================================
+   Main Content
+   Figma: y154
+======================================== */
+
+.shop-page__main {
+  position: absolute;
+  z-index: 2;
+
+  top: 154px;
+  left: 0;
+
+  width: 100%;
+}
+
+/* ========================================
+   Merchant
+   Figma: x12, y217, 378×100
+======================================== */
+
+.shop-page__merchant-image {
+  position: relative;
+  display: block;
+
+  width: calc(100% - 24px);
+  max-width: 378px;
+  height: 100px;
+
+  margin: 63px auto 0;
+  border-radius: 15px;
+
+  object-fit: cover;
+}
+
+/* ========================================
+   Recommendation Card
+   Figma: x16, y313, 370×117
+======================================== */
+
+.shop-page__recommendation {
+  position: relative;
+
+  width: calc(100% - 32px);
+  max-width: 370px;
+  height: 117px;
+
+  margin: -4px auto 0;
+
+  border: 1.5px solid #b68956;
+  border-radius: 22px;
+
+  background: linear-gradient(
+    180deg,
+    #fffcf0 0%,
+    #fff0d4 100%
+  );
+
+  box-shadow: 0 3px 3px rgba(113, 80, 33, 0.19);
+}
+
+.shop-page__recommendation::before {
+  content: '';
+  position: absolute;
+  inset: 2.5px;
+
+  border: 1.5px solid #fff;
+  border-radius: 18px;
+
+  pointer-events: none;
+}
+
+/* ========================================
+   Recommendation Label
+======================================== */
+
+.shop-page__recommendation-label {
+  position: absolute;
+  z-index: 1;
+
+  top: 6.5px;
+  left: 14.5px;
+
+  color: #cf5848;
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+/* ========================================
+   Apple Image
+   Figma: 99×73
+======================================== */
+
+.shop-page__apple-image {
+  position: absolute;
+  z-index: 1;
+
+  top: 27.5px;
+  left: 12.5px;
+
+  width: 99px;
+  height: 73px;
+  object-fit: contain;
+}
+
+/* ========================================
+   Product Information
+======================================== */
+
+.shop-page__recommendation-info {
+  position: absolute;
+  z-index: 1;
+
+  top: 24.5px;
+  left: 120.5px;
+  right: 12px;
+}
+
+.shop-page__recommendation-info h2 {
+  margin: 0;
+
+  color: #593719;
+  font-size: 19px;
+  font-weight: 900;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+.shop-page__recommendation-info p {
+  margin: 3px 0 0;
+
+  color: #593719;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+/* ========================================
+   Purchase Button
+   Figma: 98×30
+======================================== */
+
+.shop-page__purchase-button {
+  position: absolute;
+  z-index: 2;
+
+  right: 22px;
+  bottom: 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 98px;
+  height: 30px;
+  padding: 0;
+
+  border: 1.5px solid #39732b;
+  border-radius: 16px;
+
+  background: linear-gradient(
+    180deg,
+    #8dce4a 0%,
+    #329438 100%
+  );
+
+  box-shadow: 0 3px 0 #346a29;
+
+  color: #fff;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 900;
+
+  cursor: pointer;
+}
+
+.shop-page__purchase-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ========================================
+   Error
+======================================== */
+
+.shop-page__error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  width: calc(100% - 32px);
+  margin: 16px auto;
+  padding: 12px;
+
+  border-radius: 12px;
+  background: #fff9e9;
+
+  color: #593719;
+  font-size: 12px;
+}
+
+.shop-page__error button {
+  border: none;
+  background: transparent;
+  color: #39732b;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+/* ========================================
+   Feedback
+======================================== */
+
+.shop-page__feedback {
+  position: fixed;
+  z-index: 50;
+
+  left: 50%;
+  bottom: 115px;
+  transform: translateX(-50%);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  width: min(calc(100% - 32px), 370px);
+  padding: 12px 15px;
+
+  border: 2px solid #b68956;
+  border-radius: 14px;
+
+  background: #fff9e9;
+  color: #593719;
+  font-size: 12px;
+}
+
+.shop-page__feedback button {
+  border: none;
+  background: transparent;
+  color: #593719;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+/* ========================================
+   Responsive
+======================================== */
+
+@media (max-width: 390px) {
+  .shop-page__recommendation-info h2 {
+    font-size: 17px;
+  }
+
+  .shop-page__recommendation-info p {
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 350px) {
+  .shop-page__recommendation-info {
+    left: 105px;
+  }
+
+  .shop-page__apple-image {
+    left: 8px;
+    width: 88px;
+  }
+
+  .shop-page__recommendation-info h2 {
+    font-size: 15px;
+  }
+
+  .shop-page__purchase-button {
+    right: 12px;
+  }
+}
+
+
+/* ========================================
+   Orchard Selection
+======================================== */
+
+/* 과수원 선택 제목 */
+.shop-page__title--wide {
+  width: 184px;
+}
+
+.shop-page__title--wide h1 {
+  font-size: 24px;
+  white-space: nowrap;
+}
+
+/* ========================================
+   Orchard Container
+======================================== */
+
+.shop-orchard {
+  position: absolute;
+  z-index: 3;
+  top: 313px;
+  left: 0;
+
+  width: 100%;
+  height: 443px;
+  overflow-y: auto;
+  padding-bottom: 12px;
+
+  scrollbar-width: none;
+}
+
+.shop-orchard::-webkit-scrollbar {
+  display: none;
+}
+
+/* ========================================
+   Progress Steps
+   Figma: 370 × 67
+======================================== */
+
+.shop-orchard__steps {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+
+  width: calc(100% - 32px);
+  max-width: 370px;
+  height: 67px;
+  margin: 0 auto 7px;
+  padding: 0 16px;
+
+  border: 1.5px solid #b68956;
+  border-radius: 22px;
+
+  background: linear-gradient(
+    180deg,
+    #fffcf0,
+    #fff0d4
+  );
+
+  box-shadow: 0 3px 3px rgba(113, 80, 33, 0.19);
+}
+
+.shop-orchard__steps::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+
+  border: 1.5px solid #fff;
+  border-radius: 18px;
+  pointer-events: none;
+}
+
+.shop-orchard__step {
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 98px;
+  height: 30px;
+  flex-shrink: 1;
+
+  border: 1.5px solid #b68956;
+  border-radius: 16px;
+
+  background: linear-gradient(
+    180deg,
+    #fffcf1,
+    #fbe9ce
+  );
+
+  color: #593719;
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.shop-orchard__step--active {
+  border-color: #39732b;
+
+  background: linear-gradient(
+    180deg,
+    #8dce4a,
+    #329438
+  );
+
+  box-shadow: 0 3px 0 #346a29;
+  color: #fff;
+}
+
+.shop-orchard__arrow {
+  color: #795638;
+  font-size: 22px;
+  font-weight: 900;
+}
+
+/* ========================================
+   Orchard List
+======================================== */
+
+.shop-orchard__list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  width: calc(100% - 32px);
+  max-width: 370px;
+  margin: 0 auto;
+}
+
+/* ========================================
+   Orchard Card
+   Figma: 370 × 117
+======================================== */
+
+.shop-orchard__card {
+  position: relative;
+  width: 100%;
+  height: 117px;
+  flex-shrink: 0;
+
+  border: 1.5px solid #b68956;
+  border-radius: 22px;
+
+  background: linear-gradient(
+    180deg,
+    #fffcf0,
+    #fff0d4
+  );
+
+  box-shadow: 0 3px 3px rgba(113, 80, 33, 0.19);
+}
+
+.shop-orchard__card::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+
+  border: 1.5px solid #fff;
+  border-radius: 18px;
+  pointer-events: none;
+}
+
+.shop-orchard__image {
+  position: absolute;
+  top: 16px;
+  left: 10px;
+
+  width: 99px;
+  height: 78px;
+  object-fit: contain;
+}
+
+.shop-orchard__info {
+  position: absolute;
+  top: 14px;
+  left: 120px;
+  right: 12px;
+}
+
+.shop-orchard__info h2 {
+  margin: 0;
+
+  color: #593719;
+  font-size: 19px;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.shop-orchard__info p {
+  margin: 3px 0 0;
+
+  color: #593719;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.shop-orchard__status {
+  display: block;
+  margin-top: 6px;
+
+  color: #39732b;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+/* ========================================
+   Select Button
+======================================== */
+
+.shop-orchard__select {
+  position: absolute;
+  right: 22px;
+  bottom: 14px;
+
+  width: 98px;
+  height: 30px;
+
+  border: 1.5px solid #39732b;
+  border-radius: 16px;
+
+  background: linear-gradient(
+    180deg,
+    #8dce4a,
+    #329438
+  );
+
+  box-shadow: 0 3px 0 #346a29;
+
+  color: #fff;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.shop-orchard__select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ========================================
+   Empty / Error
+======================================== */
+
+.shop-orchard__empty {
+  padding: 30px 16px;
+
+  border: 1.5px solid #b68956;
+  border-radius: 22px;
+  background: #fffcf0;
+
+  color: #593719;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.shop-orchard__empty button {
+  margin-top: 10px;
+  padding: 6px 18px;
+
+  border: 1px solid #39732b;
+  border-radius: 16px;
+  background: #8dce4a;
+
+  color: #fff;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.shop-orchard__back {
+  display: block;
+  margin: 14px auto 0;
+  padding: 6px 12px;
+
+  border: none;
+  background: transparent;
+
+  color: #593719;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+/* ========================================
+   Responsive
+======================================== */
+
+@media (max-width: 350px) {
+  .shop-orchard__steps {
+    padding: 0 8px;
+  }
+
+  .shop-orchard__step {
+    font-size: 10px;
+  }
+
+  .shop-orchard__info {
+    left: 105px;
+  }
+
+  .shop-orchard__info h2 {
+    font-size: 15px;
+  }
+
+  .shop-orchard__image {
+    width: 88px;
+  }
+
+  .shop-orchard__select {
+    right: 12px;
+  }
+}
+
+
+/* ========================================
+   Orchard Selection
+======================================== */
+
+.shop-page__title--wide {
+  width: 184px;
+}
+
+.shop-page__title--wide h1 {
+  font-size: 24px;
+  white-space: nowrap;
+}
+
+.shop-orchard {
+  position: absolute;
+  z-index: 3;
+
+  top: 313px;
+  left: 0;
+
+  width: 100%;
+  height: 443px;
+  overflow-y: auto;
+  padding-bottom: 12px;
+
+  scrollbar-width: none;
+}
+
+.shop-orchard::-webkit-scrollbar {
+  display: none;
+}
+
+/* ========================================
+   Progress Steps
+======================================== */
+
+.shop-orchard__steps {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+
+  width: calc(100% - 32px);
+  max-width: 370px;
+  height: 67px;
+  margin: 0 auto 7px;
+  padding: 0 16px;
+
+  border: 1.5px solid #b68956;
+  border-radius: 22px;
+
+  background: linear-gradient(
+    180deg,
+    #fffcf0,
+    #fff0d4
+  );
+
+  box-shadow: 0 3px 3px rgba(113, 80, 33, 0.19);
+}
+
+.shop-orchard__steps::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border: 1.5px solid #fff;
+  border-radius: 18px;
+  pointer-events: none;
+}
+
+.shop-orchard__step {
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 98px;
+  height: 30px;
+  flex-shrink: 1;
+
+  border: 1.5px solid #b68956;
+  border-radius: 16px;
+
+  background: linear-gradient(
+    180deg,
+    #fffcf1,
+    #fbe9ce
+  );
+
+  color: #593719;
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.shop-orchard__step--active {
+  border-color: #39732b;
+
+  background: linear-gradient(
+    180deg,
+    #8dce4a,
+    #329438
+  );
+
+  box-shadow: 0 3px 0 #346a29;
+  color: #fff;
+}
+
+.shop-orchard__arrow {
+  color: #795638;
+  font-size: 22px;
+  font-weight: 900;
+}
+
+/* ========================================
+   Orchard Cards
+======================================== */
+
+.shop-orchard__list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  width: calc(100% - 32px);
+  max-width: 370px;
+  margin: 0 auto;
+}
+
+.shop-orchard__card {
+  position: relative;
+  width: 100%;
+  height: 117px;
+  flex-shrink: 0;
+
+  border: 1.5px solid #b68956;
+  border-radius: 22px;
+
+  background: linear-gradient(
+    180deg,
+    #fffcf0,
+    #fff0d4
+  );
+
+  box-shadow: 0 3px 3px rgba(113, 80, 33, 0.19);
+}
+
+.shop-orchard__card::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border: 1.5px solid #fff;
+  border-radius: 18px;
+  pointer-events: none;
+}
+
+.shop-orchard__image {
+  position: absolute;
+  top: 16px;
+  left: 10px;
+
+  width: 99px;
+  height: 78px;
+  object-fit: contain;
+}
+
+.shop-orchard__info {
+  position: absolute;
+  top: 14px;
+  left: 120px;
+  right: 12px;
+}
+
+.shop-orchard__info h2 {
+  margin: 0;
+  color: #593719;
+  font-size: 19px;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.shop-orchard__info p {
+  margin: 3px 0 0;
+  color: #593719;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.shop-orchard__status {
+  display: block;
+  margin-top: 6px;
+  color: #39732b;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.shop-orchard__select {
+  position: absolute;
+  right: 22px;
+  bottom: 14px;
+
+  width: 98px;
+  height: 30px;
+
+  border: 1.5px solid #39732b;
+  border-radius: 16px;
+
+  background: linear-gradient(
+    180deg,
+    #8dce4a,
+    #329438
+  );
+
+  box-shadow: 0 3px 0 #346a29;
+
+  color: #fff;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.shop-orchard__select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ========================================
+   Empty / Error
+======================================== */
+
+.shop-orchard__empty {
+  padding: 30px 16px;
+
+  border: 1.5px solid #b68956;
+  border-radius: 22px;
+  background: #fffcf0;
+
+  color: #593719;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.shop-orchard__empty button {
+  margin-top: 10px;
+  padding: 6px 18px;
+
+  border: 1px solid #39732b;
+  border-radius: 16px;
+  background: #8dce4a;
+
+  color: #fff;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.shop-orchard__back {
+  display: block;
+  margin: 14px auto 0;
+  padding: 6px 12px;
+
+  border: none;
+  background: transparent;
+
+  color: #593719;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+/* ========================================
+   Selected Product
+======================================== */
+
+.shop-page__selected-product {
+  position: absolute;
+  z-index: 4;
+
+  left: 50%;
+  bottom: 115px;
+  transform: translateX(-50%);
+
+  width: calc(100% - 32px);
+  padding: 10px 12px;
+
+  border: 1.5px solid #b68956;
+  border-radius: 14px;
+
+  background: #fff9e9;
+  color: #593719;
+
+  font-size: 12px;
+  font-weight: 900;
+  text-align: center;
+}
+
+/* ========================================
+   Responsive
+======================================== */
+
+@media (max-width: 350px) {
+  .shop-orchard__steps {
+    padding: 0 8px;
+  }
+
+  .shop-orchard__step {
+    font-size: 10px;
+  }
+
+  .shop-orchard__info {
+    left: 105px;
+  }
+
+  .shop-orchard__info h2 {
+    font-size: 15px;
+  }
+
+  .shop-orchard__image {
+    width: 88px;
+  }
+
+  .shop-orchard__select {
+    right: 12px;
+  }
+}
