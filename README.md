@@ -1,32 +1,321 @@
-# React + TypeScript + Vite
+<div align="center">
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+# 🦁 경북 원정대
 
-Currently, two official plugins are available:
+### 지역의 이야기를 모험으로, 발견의 즐거움을 일상으로
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+**대구·경북에서 발견한 가치를 누구나 즐길 수 있는 경험으로**
 
-## React Compiler
+</div>
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+<!-- TODO: 대표 이미지 삽입
+<p align="center">
+  <img src="이미지_URL" width="100%" alt="경북 원정대 대표 이미지" />
+</p>
+-->
 
-## Expanding the Oxlint configuration
+> **2026 단디톤 | RESONANCE — 우리가 대구·경북을 좋아하는 진짜 이유**
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+---
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+## 🌿 서비스 소개
+
+우리가 어떤 지역을 좋아하게 되는 순간은 언제일까요?
+
+유명한 관광지를 방문했을 때일 수도 있지만, **그 지역만의 이야기와 먹거리, 문화를 새롭게 발견했을 때**일 수도 있습니다. 그러나 지역의 매력은 종종 단편적인 정보로 소비되고, 그 지역을 잘 모르는 사람에게는 흥미로운 경험으로 이어지기 어렵습니다.
+
+**경북 원정대**는 경북의 지역과 특산물을 **캐릭터와 함께 탐험하는 게임형 지역 발견 서비스**입니다.
+
+사용자는 지역을 탐험하고, 지역 특산물을 모티브로 한 몬스터를 만나고, 퀴즈를 풀며 지역의 이야기를 알아갑니다. 탐험으로 얻은 보상은 캐릭터 성장과 수집의 동기가 되어, 다음 지역을 다시 궁금하게 만듭니다.
+
+단순히 지역 정보를 보여주는 것이 아니라, **탐험 → 발견 → 학습 → 수집 → 성장**으로 이어지는 경험을 통해 지역에 대한 관심을 즐거움으로 바꾸고자 합니다.
+
+---
+
+## 🔎 Problem
+
+### 01. 지역의 매력이 정보로만 전달됩니다
+
+지역별 특산물과 문화유산은 소개되어 있어도, 사용자가 직접 참여하고 기억할 만한 경험으로 연결되기 어렵습니다.
+
+### 02. 지역에 관심을 가질 계기가 부족합니다
+
+평소 익숙하지 않은 지역은 스스로 찾아보지 않는 이상 새로운 이야기를 접하기 어렵습니다.
+
+### 03. 한 번의 관심이 지속적인 탐색으로 이어지기 어렵습니다
+
+정보를 읽는 것만으로는 다시 방문하거나 다른 지역을 알아볼 동기가 약할 수 있습니다.
+
+<!-- TODO: 문제 정의 및 사용자 경험 관련 이미지 삽입 -->
+
+---
+
+## 💡 Solution
+
+### 01. 지역을 읽는 대신, **직접 탐험하게 합니다**
+
+경북의 지역을 게임 속 탐험 장소로 구성하고, 캐릭터와 함께 이동하며 지역의 특산물을 만나는 경험을 제공합니다.
+
+→ `수동적인 지역 정보 소비`를 `능동적인 지역 발견`으로 전환
+
+### 02. 지역의 이야기를 **퀴즈와 수집의 재미로 연결합니다**
+
+지역별 특산물과 문화·역사에 관한 이야기를 퀴즈로 풀고, 탐험을 통해 특산물 조각을 모으며 자연스럽게 지역을 알아갑니다.
+
+→ `낯선 지역에 대한 거리감`을 `알아가는 재미`로 전환
+
+### 03. 작은 성취를 쌓아 **다음 발견을 기대하게 합니다**
+
+자동 탐험 보상, 골드·경험치 획득, 캐릭터 성장과 도감 등 반복적인 성취 구조를 통해 탐험의 흐름을 이어갑니다.
+
+→ `일회성 관심`을 `지속적인 탐험 동기`로 전환
+
+---
+
+## 🧭 WHY LOCAL · WHY PEOPLE · WHY SERVICE
+
+| 질문 | 경북 원정대의 답 |
+| --- | --- |
+| **WHY LOCAL?** 왜 대구·경북인가? | 청송 사과, 안동 간고등어처럼 지역 고유의 특산물과 그 뒤에 담긴 이야기에서 탐험 소재를 발견했습니다. |
+| **WHY PEOPLE?** 왜 사람들에게 필요한가? | 지역을 잘 모르는 사람도 게임과 퀴즈를 통해 부담 없이 새로운 지역을 알아가고, 발견의 즐거움을 느낄 수 있습니다. |
+| **WHY SERVICE?** 왜 서비스로 만들어야 하는가? | 지역의 매력을 일회성 소개가 아닌, 탐험·수집·성장으로 반복 경험할 수 있도록 재설계했습니다. |
+
+> **지역을 알리는 것을 넘어, 지역을 좋아하게 되는 경험을 만듭니다.**
+
+---
+
+## ✨ Key Features
+
+<!-- TODO: 주요 기능 스크린샷 삽입. 아래 항목별로 이미지 URL을 추가하세요. -->
+
+### 🗺️ 01. 지역 탐험 지도
+
+- 경북 지역을 지도 형태로 탐색
+- 현재 탐험 지역 및 지역별 잠금·해금 상태 확인
+- 지역 상세 정보에서 탐험 화면으로 이동
+
+<!-- TODO: 탐험 지도 및 지역 상세 화면 이미지 -->
+
+### 🦁 02. 자동 탐험 게임
+
+- 사자 캐릭터의 달리기 및 상하 이동
+- 횡스크롤 배경과 몬스터 등장·이동·충돌 애니메이션
+- 1배속/2배속 전환
+- 탐험 중 지역 특산물 조각 보유량 확인
+
+<!-- TODO: 자동 탐험 게임 화면 이미지 -->
+
+### 🎁 03. 방치형 탐험 보상
+
+- 탐험 시간에 따른 보상 진행률 표시
+- 골드·경험치·몬스터 처치 수 등 보상 미리보기
+- 보상 수령 및 결과 모달 제공
+- 최대 8시간의 보상 누적 시간 표시
+
+<!-- TODO: 보상 화면 및 보상 수령 모달 이미지 -->
+
+### 🧩 04. 지역 퀴즈
+
+- 현재 탐험 지역과 관련된 퀴즈 제공
+- 정답 확인 및 해설 제공
+- 퀴즈 결과에 따른 보상 처리
+
+<!-- TODO: 퀴즈 화면 이미지 -->
+
+### 📖 05. 도감과 캐릭터
+
+- 지역 탐험과 연계된 도감 화면
+- 캐릭터 정보 및 장비 관련 화면
+- 골드·레벨·경험치 등 성장 정보 표시
+
+<!-- TODO: 도감 및 캐릭터 화면 이미지 -->
+
+### 🛍️ 06. 지역 특산물 상점
+
+- 지역 특산물 상품 목록 및 상세 화면
+- 상품 옵션·배송 정보 등 상점 UI 구성
+- 상품 API 및 목 데이터(Mock) 지원
+
+> **구현 범위 안내:** 제공된 프론트엔드 코드 기준입니다. 상점의 실제 구매·결제 완료 기능이나 전체 지역 콘텐츠의 운영 여부는 확인된 기능으로 기재하지 않았습니다.
+
+<!-- TODO: 상점 화면 이미지 -->
+
+### 주요 기능 요약
+
+| 기능 | 설명 |
+| --- | --- |
+| 지역 탐험 | 지역 지도, 상세 정보, 탐험 진입 및 잠금 상태 확인 |
+| 자동 탐험 | 캐릭터 이동, 몬스터 애니메이션, 횡스크롤 배경 및 배속 조절 |
+| 탐험 보상 | 시간 누적, 골드·경험치 보상 조회 및 수령 |
+| 지역 퀴즈 | 지역 관련 문제 풀이, 정답 해설 및 결과 보상 |
+| 도감 | 탐험과 연계된 수집 콘텐츠 화면 |
+| 캐릭터 | 캐릭터 정보 및 성장·장비 관련 UI |
+| 상점 | 지역 특산물 상품 조회 및 상점 화면 |
+
+---
+
+## 🛠 Tech Stack
+
+| Category | Technology | Usage |
+| --- | --- | --- |
+| Core | React 19, TypeScript | 컴포넌트 기반 UI 및 타입 안전성 |
+| Build | Vite 8 | 개발 서버 및 프로덕션 빌드 |
+| Styling | CSS | 화면별 스타일링, 모바일 레이아웃 및 애니메이션 |
+| State | React Hooks | 화면 상태, 게임 속도 및 데이터 관리 |
+| Navigation | React State, LocalStorage | 탭·화면 전환 및 선택 상태 유지 |
+| API | Fetch API | 탐험·퀴즈·캐릭터·도감·상점 데이터 요청 |
+| Mock | LocalStorage 및 Mock API | 백엔드 없이 주요 흐름 테스트 |
+| Quality | TypeScript, Oxlint | 타입 검사 및 코드 정적 분석 |
+| CI | GitHub Actions | 저장소 CI 워크플로 구성 |
+
+---
+
+## 🏗 Architecture
+
+경북 원정대 프론트엔드는 **React 기반 단일 페이지 애플리케이션(SPA)**입니다.
+
+- `App.tsx`에서 탭과 탐험 세부 화면의 전환을 관리합니다.
+- `pages`에서 탐험·게임·퀴즈·캐릭터·도감·상점 등 화면을 구성합니다.
+- `components`에서 헤더, 하단 네비게이션, 게임 장면, 팝업 등 공통 UI를 관리합니다.
+- `api`에서 기능별 데이터 요청 및 Mock API를 관리합니다.
+- `assets`와 `public`에서 게임 이미지 및 정적 리소스를 관리합니다.
+- `localStorage`를 통해 일부 화면 상태 및 Mock 데이터를 유지합니다.
+
+<!-- TODO: 프론트엔드 구조도 또는 서비스 흐름도 이미지 삽입 -->
+
+---
+
+## 📁 Project Structure
+
+```text
+src/
+├── api/                         # 기능별 API 및 Mock 데이터
+│   ├── character.ts
+│   ├── codex.ts
+│   ├── explore.ts
+│   ├── quiz.ts
+│   └── shop.ts
+├── assets/                      # 화면별 이미지 및 정적 리소스
+├── components/                  # 재사용 UI 컴포넌트
+│   ├── BottomNavigation/
+│   ├── GameHeader/
+│   ├── GameMenu/
+│   ├── GameScene/
+│   ├── GoldDisplay/
+│   ├── LevelDisplay/
+│   ├── QuizPopup/
+│   └── RewardModal/
+├── pages/
+│   ├── Book/                    # 도감
+│   ├── Character/               # 캐릭터
+│   ├── Explore/                 # 탐험 지도
+│   ├── Game/                    # 자동 탐험 게임
+│   ├── Quiz/                    # 지역 퀴즈
+│   ├── RegionInfo/              # 지역 상세
+│   └── Shop/                    # 지역 특산물 상점
+├── App.tsx                      # 화면 전환 및 최상위 UI
+├── App.css
+└── main.tsx                     # 애플리케이션 진입점
+
+public/
+├── game/                        # 게임 배경 및 캐릭터 리소스
+├── quiz/                        # 퀴즈 이미지
+└── regions/                     # 지역별 리소스
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+---
+
+## 🚀 Getting Started
+
+### 1. 저장소 클론
+
+```bash
+git clone https://github.com/<OWNER>/<REPOSITORY>.git
+cd <REPOSITORY>
+```
+
+> 실제 GitHub 저장소 주소로 변경해 주세요.
+
+### 2. 의존성 설치
+
+```bash
+npm install
+```
+
+### 3. 환경 변수 설정
+
+프로젝트 루트에 `.env` 파일을 생성합니다.
+
+```env
+# 기본값은 Mock API 사용
+VITE_USE_MOCK_API=true
+
+# 실제 백엔드 API를 사용할 경우
+# VITE_USE_MOCK_API=false
+# VITE_API_BASE_URL=http://localhost:3000/api/v1
+```
+
+> 현재 프론트엔드 코드에서는 `VITE_USE_MOCK_API`가 문자열 `false`일 때 실제 API를 사용합니다. 실제 API 연결 시 별도 백엔드 서버가 필요합니다.
+
+### 4. 개발 서버 실행
+
+```bash
+npm run dev
+```
+
+---
+
+## 📜 Scripts
+
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Vite 개발 서버 실행 |
+| `npm run build` | TypeScript 검사 및 프로덕션 빌드 |
+| `npm run lint` | Oxlint 정적 분석 |
+| `npm run preview` | 빌드 결과 로컬 미리보기 |
+
+---
+
+## 👥 Team
+
+<!-- TODO: 팀원 이름, 역할, GitHub 계정을 입력하세요. -->
+
+| Role | Name | GitHub |
+| --- | --- | --- |
+| 기획 / 디자인 | TODO | TODO |
+| 프론트엔드 | TODO | TODO |
+| 백엔드 | TODO | TODO |
+
+---
+
+## 📝 Commit Convention
+
+[Conventional Commits](https://www.conventionalcommits.org/) 형식을 사용합니다.
+
+```text
+<type>: <subject>
+```
+
+| Type | 설명 |
+| --- | --- |
+| `feat` | 새로운 기능 추가 |
+| `fix` | 버그 수정 |
+| `refactor` | 동작 변경 없는 코드 구조 개선 |
+| `style` | 코드 포맷 및 스타일 수정 |
+| `docs` | 문서 추가 또는 수정 |
+| `test` | 테스트 추가 또는 수정 |
+| `chore` | 설정·패키지 등 기타 작업 |
+
+---
+
+## 🌱 확장 가능성
+
+경북 원정대는 **지역의 고유한 이야기를 게임 속 발견 경험으로 전환하는 구조**를 기반으로 합니다.
+
+향후 지역별 콘텐츠를 확대하고, 지역 퀴즈·수집 요소·특산물 콘텐츠를 연결하여 더 많은 지역의 매력을 발견할 수 있는 서비스로 발전시킬 수 있습니다.
+
+**지역에서 시작한 즐거움이, 더 많은 사람의 일상 속 새로운 발견으로 이어지도록.**
+
+---
+
+<!-- TODO: 실제 라이선스가 정해진 경우 LICENSE 파일 및 라이선스 안내 추가 -->
