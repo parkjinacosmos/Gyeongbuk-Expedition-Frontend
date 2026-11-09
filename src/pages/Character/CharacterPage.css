@@ -4,31 +4,35 @@
 
 .character-page {
   position: relative;
-
   width: 100%;
-  max-width: 390px;
+  max-width: 402px;
   min-height: 100dvh;
   margin: 0 auto;
-
-  padding: 0 8px 120px;
+  padding: 0 0 120px;
   box-sizing: border-box;
+  overflow-x: clip;
 
   color: #54371f;
   font-family: 'Noto Sans KR', sans-serif;
 
+  background-color: #83cfff;
   background-image: url('../../assets/character/background.png');
   background-position: center top;
-  background-size: 100% 100%;
+  background-size: 100% auto;
   background-repeat: no-repeat;
-  background-color: #83cfff;
+}
+
+.character-page *,
+.character-page *::before,
+.character-page *::after {
+  box-sizing: border-box;
 }
 
 .character-page__content {
   position: relative;
   z-index: 1;
-
   width: 100%;
-  max-width: 390px;
+  max-width: 402px;
   margin: 0 auto;
 }
 
@@ -37,7 +41,7 @@
 ======================================== */
 
 .character-page .game-header {
-  height: 100px;
+  height: 139px;
 }
 
 .character-page .game-header__profile {
@@ -60,125 +64,129 @@
 ======================================== */
 
 .character-page__title {
-  width: 56%;
-  max-width: 210px;
-  margin: 0 auto 9px;
-  padding: 6px 12px;
-  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  border: 3px solid #bc9254;
-  border-radius: 30px;
+  width: 216px;
+  max-width: calc(100% - 32px);
+  height: 61px;
+  margin: 0 auto 8px;
+  padding: 0;
+
+  border: 2px solid #9a6a35;
+  border-radius: 27px;
 
   background: linear-gradient(
     180deg,
-    #fff9dc 0%,
-    #ffe9b0 45%,
-    #f6c878 100%
+    #fff3d8 0%,
+    #f3cc91 100%
   );
 
   box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -2px 0 rgba(194, 131, 53, 0.18),
-    0 4px 0 #bd884b,
-    0 6px 10px rgba(91, 58, 23, 0.18);
+    inset 0 0 0 2px #fffef1,
+    0 3px 3px rgba(113, 80, 33, 0.19);
 
-  color: #54371f;
-  text-align: center;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
-  font-size: 19px;
+  color: #593719;
+  font-size: 26px;
   font-weight: 900;
-  line-height: 1.3;
+  line-height: 1.35;
+  text-align: center;
 }
 
 /* ========================================
-   Character and Stats
+   Character & Stats
 ======================================== */
 
 .character-page__hero {
-  display: grid;
-  grid-template-columns: 39% minmax(0, 61%);
-  align-items: end;
-  gap: 0;
-
-  min-height: 150px;
-  margin-bottom: 8px;
+  position: relative;
+  width: calc(100% - 36px);
+  height: 202px;
+  margin: 0 18px 12px;
 }
 
 .character-page__illustration {
+  position: absolute;
+  z-index: 2;
+  top: 10px;
+  left: 0;
+
   display: flex;
   align-items: flex-end;
   justify-content: center;
 
-  height: 150px;
-  padding-bottom: 3px;
-  box-sizing: border-box;
+  width: 145px;
+  height: 182px;
 }
 
 .character-page__character-image {
   display: block;
-  width: 100%;
-  max-width: 145px;
-  height: 150px;
+  width: 130px;
+  max-width: none;
+  height: 167px;
 
   object-fit: contain;
   object-position: center bottom;
 
-  filter: drop-shadow(0 5px 3px rgba(70, 57, 32, 0.19));
+  filter: drop-shadow(
+    0 4px 2px rgba(70, 57, 32, 0.18)
+  );
 }
 
 .character-page__stats {
-  min-width: 0;
-  padding: 10px 9px;
-  box-sizing: border-box;
+  position: absolute;
+  z-index: 1;
+  top: 5px;
+  right: 0;
 
-  border: 2px solid #c89a5e;
-  border-radius: 19px;
+  width: 213px;
+  min-width: 0;
+  min-height: 187px;
+  padding: 15px 10px 12px;
+
+  border: 1.5px solid #b68956;
+  border-radius: 22px;
 
   background: linear-gradient(
-    160deg,
-    #fffdf3 0%,
-    #fff5df 55%,
-    #f7e4bf 100%
+    180deg,
+    #fffcf0 0%,
+    #fff0d4 100%
   );
 
   box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -2px 0 rgba(205, 155, 87, 0.15),
-    0 4px 0 rgba(151, 103, 50, 0.32),
-    0 6px 12px rgba(91, 58, 23, 0.14);
+    inset 0 0 0 2.5px #fff,
+    0 3px 3px rgba(113, 80, 33, 0.19);
 }
+
+/* ========================================
+   Character Stats Details
+======================================== */
 
 .character-page__level {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 14px;
 
-  color: #438f36;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
-  font-size: 11px;
+  color: #4f9c3f;
+  font-size: 14px;
   font-weight: 900;
 }
 
 .character-page__exp-label {
-  margin-bottom: 5px;
-  font-size: 10px;
-  font-weight: 800;
+  margin-bottom: 6px;
+
+  color: #593719;
+  font-size: 12px;
+  font-weight: 900;
 }
 
 .character-page__exp-track {
-  height: 8px;
-  margin-bottom: 10px;
+  height: 13px;
+  margin-bottom: 16px;
   overflow: hidden;
 
-  border-radius: 20px;
-  background: linear-gradient(
-    180deg,
-    #c8c5b9 0%,
-    #e6e1d3 100%
-  );
-
-  box-shadow:
-    inset 0 1px 3px rgba(78, 60, 35, 0.25),
-    0 1px 0 rgba(255, 255, 255, 0.9);
+  border: 1px solid #fffef4;
+  border-radius: 8px;
+  background: #d3cabb;
 }
 
 .character-page__exp-fill {
@@ -187,12 +195,10 @@
 
   background: linear-gradient(
     180deg,
-    #c6ec76 0%,
-    #8bc54a 50%,
-    #58a037 100%
+    #9cd75b,
+    #39a341
   );
 
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
   transition: width 250ms ease;
 }
 
@@ -202,38 +208,24 @@
   justify-content: space-between;
   gap: 4px;
 
-  min-height: 28px;
-  margin-top: 6px;
-  padding: 5px 7px;
-  box-sizing: border-box;
+  min-height: 29px;
+  margin-top: 9px;
+  padding: 5px 9px;
 
-  border: 1px solid rgba(204, 155, 78, 0.28);
-  border-radius: 8px;
+  border-radius: 10px;
+  background: #ffe99f;
 
-  background: linear-gradient(
-    180deg,
-    #fff2bd 0%,
-    #ffe09a 100%
-  );
-
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    0 2px 3px rgba(116, 78, 36, 0.08);
-
-  font-size: 10px;
-  font-weight: 800;
+  color: #593719;
+  font-size: 12px;
+  font-weight: 900;
 }
 
 .character-page__bonus + .character-page__bonus {
-  background: linear-gradient(
-    180deg,
-    #fff8e9 0%,
-    #f2dfb9 100%
-  );
+  background: #f7e6cd;
 }
 
 .character-page__bonus strong {
-  color: #4d8f36;
+  color: #4f9c3f;
 }
 
 /* ========================================
@@ -243,9 +235,8 @@
 .character-page__slots {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 6px;
-
-  margin-bottom: 8px;
+  gap: 11px;
+  margin: 0 18px 10px;
 }
 
 .character-page__slot {
@@ -253,43 +244,38 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 4px;
 
+  width: 100%;
   min-width: 0;
-  height: 69px;
+  height: 80px;
+  padding: 7px 3px;
 
-  border: 2px solid #d6a36c;
-  border-radius: 14px;
+  border: 1.5px solid #cca36f;
+  border-radius: 20px;
 
   background: linear-gradient(
-    165deg,
-    #fff9e7 0%,
-    #ffedc8 52%,
-    #f4d7a5 100%
+    180deg,
+    #fffef4 0%,
+    #ffe8bf 100%
   );
 
-  box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -2px 0 rgba(193, 137, 66, 0.15),
-    0 3px 0 rgba(155, 102, 46, 0.4),
-    0 5px 8px rgba(83, 53, 21, 0.12);
+  box-shadow: 0 3px 2px rgba(113, 80, 33, 0.2);
 }
 
 .character-page__slot-image {
   display: block;
-  width: 39px;
-  height: 39px;
+  width: 46px;
+  height: 45px;
   object-fit: contain;
-
-  filter: drop-shadow(0 2px 2px rgba(91, 58, 23, 0.16));
 }
 
 .character-page__slot strong {
-  color: #54371f;
-  font-size: 9px;
-  font-weight: 800;
+  color: #593719;
+  font-size: 10px;
+  font-weight: 900;
+  text-align: center;
   white-space: nowrap;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.65);
 }
 
 /* ========================================
@@ -297,23 +283,21 @@
 ======================================== */
 
 .character-page__upgrade {
-  padding: 10px 9px 11px;
+  margin: 0 16px;
+  padding: 12px 8px 14px;
 
-  border: 3px solid #c89b62;
-  border-radius: 20px;
+  border: 1.5px solid #b68956;
+  border-radius: 22px;
 
   background: linear-gradient(
-    160deg,
-    #fffaf0 0%,
-    #fff0d2 48%,
-    #f4dfb8 100%
+    180deg,
+    #fffcf0 0%,
+    #fff0d4 100%
   );
 
   box-shadow:
-    inset 0 3px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -3px 0 rgba(185, 130, 60, 0.14),
-    0 5px 0 rgba(155, 102, 46, 0.5),
-    0 8px 16px rgba(85, 52, 20, 0.16);
+    inset 0 0 0 2.5px #fff,
+    0 3px 3px rgba(113, 80, 33, 0.19);
 }
 
 .character-page__upgrade-heading {
@@ -325,35 +309,32 @@
 
 .character-page__upgrade-heading h2 {
   margin: 0;
+  padding: 5px 7px;
 
-  color: #54371f;
-  font-size: 17px;
+  color: #593719;
+  font-size: 19px;
   font-weight: 900;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .character-page__upgrade-heading span {
-  padding: 3px 6px;
-  border: 1px solid rgba(106, 166, 66, 0.35);
-  border-radius: 10px;
+  padding: 4px 7px;
 
-  background: linear-gradient(
-    180deg,
-    #f1ffd9 0%,
-    #d9efb5 100%
-  );
+  border: 1px solid #b7dca2;
+  border-radius: 12px;
+  background: #e3f6c6;
 
-  color: #4d9438;
-  font-size: 9px;
+  color: #4f9c3f;
+  font-size: 10px;
   font-weight: 900;
 }
 
 .character-page__upgrade-desc {
-  margin: 6px 0 10px;
+  margin: 8px 0 12px;
 
+  color: #593719;
+  font-size: 11px;
+  font-weight: 900;
   text-align: center;
-  font-size: 10px;
-  font-weight: 800;
 }
 
 /* ========================================
@@ -365,8 +346,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-
-  margin: 0 8px 7px;
+  margin: 0 8px 9px;
 }
 
 .character-page__stage-track::before {
@@ -375,13 +355,12 @@
   top: 50%;
   right: 10px;
   left: 10px;
-
   height: 3px;
 
   background: linear-gradient(
     90deg,
-    #d9ac62 0%,
-    #c69a63 100%
+    #d9ac62,
+    #c69a63
   );
 
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
@@ -395,8 +374,8 @@
   display: grid;
   place-items: center;
 
-  width: 27px;
-  height: 27px;
+  width: 28px;
+  height: 28px;
   flex-shrink: 0;
 
   border: 2px solid #c69a63;
@@ -404,8 +383,8 @@
 
   background: linear-gradient(
     180deg,
-    #fffdf3 0%,
-    #f4dfbb 100%
+    #fffdf3,
+    #f4dfbb
   );
 
   box-shadow:
@@ -449,32 +428,28 @@
   gap: 3px;
 
   min-width: 0;
-  padding: 5px 2px;
+  min-height: 61px;
+  padding: 7px 2px;
 
   border: 1px solid #e1bb86;
-  border-radius: 9px;
-
-  background: linear-gradient(
-    180deg,
-    #fff7e3 0%,
-    #ffe9bd 100%
-  );
+  border-radius: 10px;
+  background: #fff3df;
 
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.9),
     0 2px 0 rgba(174, 119, 53, 0.23);
 
-  text-align: center;
   font-size: 9px;
+  text-align: center;
 }
 
 .character-page__stage-card.is-next {
-  border: 2px solid #e8a820;
+  border: 1.5px solid #e8a820;
 
   background: linear-gradient(
     180deg,
-    #fff3b6 0%,
-    #ffd775 100%
+    #fff3b6,
+    #ffd775
   );
 
   box-shadow:
@@ -498,28 +473,24 @@
 .character-page__upgrade-button {
   display: block;
   width: 60%;
-  min-height: 31px;
+  height: 34px;
+  min-height: 34px;
   margin: 9px auto 0;
-  padding: 5px 10px;
+  padding: 0;
 
-  border: 1px solid #4d9c35;
-  border-radius: 20px;
+  border: 1.5px solid #39732b;
+  border-radius: 16px;
 
   background: linear-gradient(
     180deg,
-    #b5e56d 0%,
-    #83c64a 38%,
-    #4b9d34 100%
+    #8dce4a,
+    #329438
   );
 
-  box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 0.5),
-    0 3px 0 #367d2b,
-    0 5px 8px rgba(42, 91, 30, 0.2);
+  box-shadow: 0 3px 0 #346a29;
 
   color: #fff;
-  text-shadow: 0 1px 1px rgba(37, 83, 24, 0.55);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 900;
   cursor: pointer;
 
@@ -535,7 +506,6 @@
 
 .character-page__upgrade-button:not(:disabled):active {
   transform: translateY(2px);
-
   box-shadow:
     inset 0 2px 3px rgba(37, 83, 24, 0.16),
     0 1px 0 #367d2b;
@@ -572,18 +542,44 @@
    Responsive
 ======================================== */
 
-@media (max-width: 360px) {
-  .character-page {
-    padding-right: 6px;
-    padding-left: 6px;
+@media (max-width: 380px) {
+  .character-page__hero {
+    width: calc(100% - 24px);
+    margin-right: 12px;
+    margin-left: 12px;
   }
 
+  .character-page__illustration {
+    width: 36%;
+  }
+
+  .character-page__character-image {
+    width: 100%;
+  }
+
+  .character-page__stats {
+    width: 59%;
+  }
+
+  .character-page__slots {
+    gap: 6px;
+    margin-right: 12px;
+    margin-left: 12px;
+  }
+
+  .character-page__slot strong {
+    font-size: 9px;
+  }
+
+  .character-page__upgrade {
+    margin-right: 12px;
+    margin-left: 12px;
+  }
+}
+
+@media (max-width: 360px) {
   .character-page__title {
     font-size: 17px;
-  }
-
-  .character-page__hero {
-    grid-template-columns: 38% minmax(0, 62%);
   }
 
   .character-page__stats {
@@ -606,16 +602,5 @@
 
   .character-page__upgrade-heading h2 {
     font-size: 15px;
-  }
-}
-
-@media (min-width: 391px) {
-  .character-page {
-    max-width: none;
-  }
-
-  .character-page__content {
-    max-width: 374px;
-    margin: 0 auto;
   }
 }
