@@ -4,6 +4,7 @@ import ExplorePage from './pages/Explore/ExplorePage';
 import GamePage from './pages/Game/GamePage';
 import RegionInfoPage from './pages/RegionInfo/RegionInfoPage';
 import QuizPage from './pages/Quiz/QuizPage';
+import CharacterPage from './pages/Character/CharacterPage';
 
 import BottomNavigation from './components/BottomNavigation/BottomNavigation';
 
@@ -33,10 +34,9 @@ const STORAGE_KEYS = {
 // ========================================
 
 const pageTitles: Record<
-  Exclude<NavigationItem, 'explore'>,
+  Exclude<NavigationItem, 'explore' | 'character'>,
   string
 > = {
-  character: '캐릭터',
   book: '도감',
   shop: '상점',
 };
@@ -187,7 +187,11 @@ export default function App() {
   };
 
   const openQuiz = () => {
-    if (exploreScreen !== 'quiz') {
+    if (activeTab === 'character') {
+      // 캐릭터 페이지에서 퀴즈 진입 시
+      // 퀴즈 종료 후 탐험 지도로 돌아가기
+      setQuizReturnScreen('map');
+    } else if (exploreScreen !== 'quiz') {
       setQuizReturnScreen(exploreScreen);
     }
 
@@ -267,6 +271,17 @@ export default function App() {
       return null;
     }
 
+    // 캐릭터 페이지 및 메뉴 이동 연결
+    if (activeTab === 'character') {
+      return (
+        <CharacterPage
+          onOpenMap={openMap}
+          onOpenQuiz={openQuiz}
+        />
+      );
+    }
+
+    // 도감 및 상점은 기존 임시 화면 유지
     return (
       <main
         style={{

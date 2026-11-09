@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import './BottomNavigation.css';
 import navigationIcons from '../../assets/navigation-icons.png';
