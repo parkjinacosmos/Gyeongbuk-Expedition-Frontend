@@ -276,18 +276,6 @@ npm run dev
 
 ---
 
-## 👥 Team
-
-<!-- TODO: 팀원 이름, 역할, GitHub 계정을 입력하세요. -->
-
-| Role | Name | GitHub |
-| --- | --- | --- |
-| 기획 / 디자인 | TODO | TODO |
-| 프론트엔드 | TODO | TODO |
-| 백엔드 | TODO | TODO |
-
----
-
 ## 📝 Commit Convention
 
 [Conventional Commits](https://www.conventionalcommits.org/) 형식을 사용합니다.
