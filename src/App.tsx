@@ -6,6 +6,7 @@ import RegionInfoPage from './pages/RegionInfo/RegionInfoPage';
 import QuizPage from './pages/Quiz/QuizPage';
 import CharacterPage from './pages/Character/CharacterPage';
 import BookPage from './pages/Book/BookPage';
+import ShopPage from './pages/Shop/ShopPage';
 
 import BottomNavigation from './components/BottomNavigation/BottomNavigation';
 
@@ -288,6 +289,9 @@ export default function App() {
         />
       );
     }
+    if (activeTab === 'shop') {
+  return <ShopPage />;
+}
 
     return (
       <main
