@@ -46,70 +46,14 @@ interface DisplayRegion extends RegionDesign {
 }
 
 const regionDesigns: RegionDesign[] = [
-  {
-    id: 1,
-    name: '청송',
-    product: '사과',
-    image: appleImage,
-    x: 60,
-    y: 8,
-  },
-  {
-    id: 2,
-    name: '안동',
-    product: '간고등어',
-    image: mackerelImage,
-    x: 208,
-    y: 8,
-  },
-  {
-    id: 3,
-    name: '영주',
-    product: '풍기인삼',
-    image: ginsengImage,
-    x: 255,
-    y: 116,
-  },
-  {
-    id: 4,
-    name: '문경',
-    product: '오미자',
-    image: omijaImage,
-    x: 116,
-    y: 116,
-  },
-  {
-    id: 5,
-    name: '상주',
-    product: '곶감',
-    image: persimmonImage,
-    x: 61,
-    y: 224,
-  },
-  {
-    id: 6,
-    name: '성주',
-    product: '참외',
-    image: melonImage,
-    x: 204,
-    y: 224,
-  },
-  {
-    id: 7,
-    name: '의성',
-    product: '마늘',
-    image: garlicImage,
-    x: 81,
-    y: 332,
-  },
-  {
-    id: 8,
-    name: '포항',
-    product: '과메기',
-    image: gwamegiImage,
-    x: 219,
-    y: 332,
-  },
+  { id: 1, name: '청송', product: '사과', image: appleImage, x: 60, y: 8 },
+  { id: 2, name: '안동', product: '간고등어', image: mackerelImage, x: 208, y: 8 },
+  { id: 3, name: '영주', product: '풍기인삼', image: ginsengImage, x: 255, y: 116 },
+  { id: 4, name: '문경', product: '오미자', image: omijaImage, x: 116, y: 116 },
+  { id: 5, name: '상주', product: '곶감', image: persimmonImage, x: 61, y: 224 },
+  { id: 6, name: '성주', product: '참외', image: melonImage, x: 204, y: 224 },
+  { id: 7, name: '의성', product: '마늘', image: garlicImage, x: 81, y: 332 },
+  { id: 8, name: '포항', product: '과메기', image: gwamegiImage, x: 219, y: 332 },
 ];
 
 function getErrorMessage(error: unknown): string {
@@ -142,10 +86,7 @@ function getRegionRequirement(
       required_pieces,
     } = region.unlock;
 
-    return (
-      `${specialty_name} 조각 ` +
-      `${current_pieces}/${required_pieces}개`
-    );
+    return `${specialty_name} 조각 ${current_pieces}/${required_pieces}개`;
   }
 
   return '잠긴 지역';
@@ -156,12 +97,8 @@ export default function ExplorePage({
   onOpenRegionInfo,
   onOpenQuiz,
 }: ExplorePageProps) {
-  const [user, setUser] =
-    useState<ExploreUser | null>(null);
-
-  const [apiRegions, setApiRegions] =
-    useState<ExploreRegion[]>([]);
-
+  const [user, setUser] = useState<ExploreUser | null>(null);
+  const [apiRegions, setApiRegions] = useState<ExploreRegion[]>([]);
   const [selectedId, setSelectedId] = useState(1);
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState('');
@@ -175,11 +112,10 @@ export default function ExplorePage({
       setNotice('');
 
       try {
-        const [userData, regionData] =
-          await Promise.all([
-            exploreApi.getUser(),
-            exploreApi.getRegions(),
-          ]);
+        const [userData, regionData] = await Promise.all([
+          exploreApi.getUser(),
+          exploreApi.getRegions(),
+        ]);
 
         if (cancelled) return;
 
@@ -189,9 +125,7 @@ export default function ExplorePage({
         const currentId = userData.cur_region.id;
 
         setSelectedId(
-          regionDesigns.some(
-            (region) => region.id === currentId,
-          )
+          regionDesigns.some((region) => region.id === currentId)
             ? currentId
             : 1,
         );
@@ -214,38 +148,22 @@ export default function ExplorePage({
   }, []);
 
   const regionMap = useMemo(
-    () =>
-      new Map(
-        apiRegions.map((region) => [
-          region.id,
-          region,
-        ]),
-      ),
+    () => new Map(apiRegions.map((region) => [region.id, region])),
     [apiRegions],
   );
 
   const regions: DisplayRegion[] = useMemo(
     () =>
       regionDesigns.map((design) => {
-        const apiData =
-          regionMap.get(design.id) ?? null;
-
-        const isCurrent =
-          user?.cur_region.id === design.id;
-
-        const status = getRegionStatus(
-          apiData,
-          isCurrent,
-        );
+        const apiData = regionMap.get(design.id) ?? null;
+        const isCurrent = user?.cur_region.id === design.id;
+        const status = getRegionStatus(apiData, isCurrent);
 
         return {
           ...design,
           apiData,
           status,
-          requirement: getRegionRequirement(
-            apiData,
-            status,
-          ),
+          requirement: getRegionRequirement(apiData, status),
         };
       }),
     [regionMap, user],
@@ -254,20 +172,13 @@ export default function ExplorePage({
   const currentId = user?.cur_region.id ?? 1;
 
   const currentRegion =
-    regions.find(
-      (region) => region.id === currentId,
-    ) ?? regions[0];
+    regions.find((region) => region.id === currentId) ?? regions[0];
 
   const selectedRegion =
-    regions.find(
-      (region) => region.id === selectedId,
-    ) ?? currentRegion;
+    regions.find((region) => region.id === selectedId) ?? currentRegion;
 
-  const isCurrent =
-    selectedRegion.id === currentId;
-
-  const isLocked =
-    selectedRegion.status === 'locked';
+  const isCurrent = selectedRegion.id === currentId;
+  const isLocked = selectedRegion.status === 'locked';
 
   function handleRegionSelect() {
     if (loading || !user) return;
@@ -291,13 +202,15 @@ export default function ExplorePage({
 
   return (
     <main className="explore-page">
-      <div className="explore-page__content">
-        <img
-          className="explore-page__background"
-          src={mapBackground}
-          alt=""
-        />
+      {/* 탐험 지도 배경: 움직이지 않음 */}
+      <div
+        className="explore-page__background"
+        aria-hidden="true"
+      >
+        <img src={mapBackground} alt="" />
+      </div>
 
+      <div className="explore-page__content">
         <GameHeader
           user={user}
           variant="explore"
@@ -305,13 +218,9 @@ export default function ExplorePage({
           regionName={currentRegion.name}
           specialtyName={currentRegion.product}
           menuOpen={menuOpen}
-          onOpenMenu={() =>
-            setMenuOpen((prev) => !prev)
-          }
+          onOpenMenu={() => setMenuOpen((prev) => !prev)}
           onAddGold={() =>
-            setNotice(
-              '골드 충전 기능은 준비 중이에요.',
-            )
+            setNotice('골드 충전 기능은 준비 중이에요.')
           }
         />
 
@@ -343,14 +252,9 @@ export default function ExplorePage({
           </svg>
 
           {regions.map((region) => {
-            const active =
-              region.id === currentId;
-
-            const selected =
-              region.id === selectedId;
-
-            const locked =
-              region.status === 'locked';
+            const active = region.id === currentId;
+            const selected = region.id === selectedId;
+            const locked = region.status === 'locked';
 
             return (
               <button
@@ -373,10 +277,7 @@ export default function ExplorePage({
                   setNotice('');
                 }}
                 aria-pressed={selected}
-                aria-label={
-                  `${region.name} ${region.product}, ` +
-                  region.requirement
-                }
+                aria-label={`${region.name} ${region.product}, ${region.requirement}`}
               >
                 <span className="explore-region__code">
                   R{String(region.id).padStart(2, '0')}
@@ -426,8 +327,7 @@ export default function ExplorePage({
 
           <div className="explore-detail__info">
             <h2>
-              {selectedRegion.name} ·{' '}
-              {selectedRegion.product}
+              {selectedRegion.name} · {selectedRegion.product}
             </h2>
 
             <p>
@@ -453,18 +353,13 @@ export default function ExplorePage({
               onClick={handleRegionSelect}
               disabled={loading || !user}
             >
-              {isCurrent
-                ? '탐험 입장 ›'
-                : '지역 정보 보기 ›'}
+              {isCurrent ? '탐험 입장 ›' : '지역 정보 보기 ›'}
             </button>
           </div>
         </section>
 
         {notice && (
-          <div
-            className="explore-notice"
-            role="status"
-          >
+          <div className="explore-notice" role="status">
             <span>{notice}</span>
             <button
               type="button"
