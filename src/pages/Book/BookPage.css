@@ -616,3 +616,15 @@
     right: 32px;
   }
 }
+
+@media (min-width: 391px) {
+  .book-page {
+    max-width: none;
+  }
+
+  .book-page__content {
+    width: 100%;
+    max-width: 374px;
+    margin: 0 auto;
+  }
+}

@@ -608,3 +608,14 @@
     font-size: 15px;
   }
 }
+
+@media (min-width: 391px) {
+  .character-page {
+    max-width: none;
+  }
+
+  .character-page__content {
+    max-width: 374px;
+    margin: 0 auto;
+  }
+}
