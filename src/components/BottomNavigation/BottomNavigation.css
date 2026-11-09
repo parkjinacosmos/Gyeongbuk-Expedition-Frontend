@@ -2,6 +2,7 @@
    Bottom Navigation
 ======================================== */
 
+
 .bottom-navigation {
   position: fixed;
   bottom: 0;
@@ -9,8 +10,11 @@
   transform: translateX(-50%);
 
   width: 100%;
-  max-width: 390px;
-  height: 104px;
+  max-width: 402px;
+
+  height: calc(104px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+
   z-index: 100;
 
   background: linear-gradient(
@@ -22,6 +26,7 @@
   border-top: 2px solid #8bb864;
   box-sizing: border-box;
 }
+
 
 /* ========================================
    Menu Container
