@@ -357,48 +357,41 @@
   cursor: pointer;
 }
 
+
+
 /* ========================================
    Responsive
 ======================================== */
 
-/* 402px 기준의 게임 화면을 가운데 배치 */
 .explore-page {
   --explore-scale: min(1, calc(100vw / 402px));
 
   width: 100%;
   min-height: 100dvh;
+  padding-bottom: calc(
+    104px + env(safe-area-inset-bottom, 0px)
+  );
+
   overflow-x: clip;
+  overflow-y: auto;
 }
 
-/* 기존 402px 디자인 유지 */
 .explore-page__content {
   position: relative;
+  left: 50%;
+
   width: 402px;
   height: 770px;
 
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0;
 
-  transform: scale(var(--explore-scale));
+  transform:
+    translateX(-50%)
+    scale(var(--explore-scale));
+
   transform-origin: top center;
-}
 
-/* 모바일 화면 */
-@media (max-width: 401px) {
-  .explore-page__content {
-    left: 50%;
-    margin-left: 0;
-    margin-right: 0;
-
-    transform:
-      translateX(-50%)
-      scale(var(--explore-scale));
-  }
-}
-
-/* 화면 높이가 낮아도 콘텐츠를 잘라내지 않음 */
-@media (max-height: 850px) {
-  .explore-page {
-    overflow-y: auto;
-  }
+  margin-bottom: calc(
+    -770px * (1 - var(--explore-scale))
+  );
 }
