@@ -13,10 +13,10 @@ import './GameHeader.css';
 
 interface GameHeaderProps {
   user: ExploreUser | null;
-  regionImage: string;
-  regionName: string;
+  regionImage?: string;
+  regionName?: string;
   specialtyName?: string;
-  variant?: 'explore' | 'game';
+  variant?: 'explore' | 'game' | 'character';
   menuOpen?: boolean;
   onOpenMenu: () => void;
   onAddGold: () => void;
@@ -25,8 +25,8 @@ interface GameHeaderProps {
 
 export default function GameHeader({
   user,
-  regionImage,
-  regionName,
+  regionImage = '',
+  regionName = '',
   specialtyName,
   variant = 'explore',
   menuOpen = false,
@@ -43,19 +43,21 @@ export default function GameHeader({
         profileImage={profileImage}
       />
 
-      <div className="game-header__region">
-        <span>
-          현재 지역 {user?.cur_region.code ?? '—'}
-        </span>
+      {variant !== 'character' && (
+        <div className="game-header__region">
+          <span>
+            현재 지역 {user?.cur_region.code ?? '—'}
+          </span>
 
-        <strong>
-          <img src={regionImage} alt="" />
-          {regionName}
-          {variant === 'explore' && specialtyName
-            ? ` ${specialtyName}`
-            : ''}
-        </strong>
-      </div>
+          <strong>
+            <img src={regionImage} alt="" />
+            {regionName}
+            {variant === 'explore' && specialtyName
+              ? ` ${specialtyName}`
+              : ''}
+          </strong>
+        </div>
+      )}
 
       <GoldDisplay
         className="game-header__gold"

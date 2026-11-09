@@ -1,0 +1,610 @@
+/* ========================================
+   Character Page
+======================================== */
+
+.character-page {
+  position: relative;
+
+  width: 100%;
+  max-width: 390px;
+  min-height: 100dvh;
+  margin: 0 auto;
+
+  padding: 0 8px 120px;
+  box-sizing: border-box;
+
+  color: #54371f;
+  font-family: 'Noto Sans KR', sans-serif;
+
+  background-image: url('../../assets/character/background.png');
+  background-position: center top;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-color: #83cfff;
+}
+
+.character-page__content {
+  position: relative;
+  z-index: 1;
+
+  width: 100%;
+  max-width: 390px;
+  margin: 0 auto;
+}
+
+/* ========================================
+   Shared Game Header
+======================================== */
+
+.character-page .game-header {
+  height: 100px;
+}
+
+.character-page .game-header__profile {
+  top: 34px;
+  left: 0;
+}
+
+.character-page .game-header__gold {
+  top: 34px;
+  right: 0;
+}
+
+.character-page .game-header__menu {
+  top: 77px;
+  right: 0;
+}
+
+/* ========================================
+   Page Title
+======================================== */
+
+.character-page__title {
+  width: 56%;
+  max-width: 210px;
+  margin: 0 auto 9px;
+  padding: 6px 12px;
+  box-sizing: border-box;
+
+  border: 3px solid #bc9254;
+  border-radius: 30px;
+
+  background: linear-gradient(
+    180deg,
+    #fff9dc 0%,
+    #ffe9b0 45%,
+    #f6c878 100%
+  );
+
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -2px 0 rgba(194, 131, 53, 0.18),
+    0 4px 0 #bd884b,
+    0 6px 10px rgba(91, 58, 23, 0.18);
+
+  color: #54371f;
+  text-align: center;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+  font-size: 19px;
+  font-weight: 900;
+  line-height: 1.3;
+}
+
+/* ========================================
+   Character and Stats
+======================================== */
+
+.character-page__hero {
+  display: grid;
+  grid-template-columns: 39% minmax(0, 61%);
+  align-items: end;
+  gap: 0;
+
+  min-height: 150px;
+  margin-bottom: 8px;
+}
+
+.character-page__illustration {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+
+  height: 150px;
+  padding-bottom: 3px;
+  box-sizing: border-box;
+}
+
+.character-page__character-image {
+  display: block;
+  width: 100%;
+  max-width: 145px;
+  height: 150px;
+
+  object-fit: contain;
+  object-position: center bottom;
+
+  filter: drop-shadow(0 5px 3px rgba(70, 57, 32, 0.19));
+}
+
+.character-page__stats {
+  min-width: 0;
+  padding: 10px 9px;
+  box-sizing: border-box;
+
+  border: 2px solid #c89a5e;
+  border-radius: 19px;
+
+  background: linear-gradient(
+    160deg,
+    #fffdf3 0%,
+    #fff5df 55%,
+    #f7e4bf 100%
+  );
+
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -2px 0 rgba(205, 155, 87, 0.15),
+    0 4px 0 rgba(151, 103, 50, 0.32),
+    0 6px 12px rgba(91, 58, 23, 0.14);
+}
+
+.character-page__level {
+  display: block;
+  margin-bottom: 8px;
+
+  color: #438f36;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.character-page__exp-label {
+  margin-bottom: 5px;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.character-page__exp-track {
+  height: 8px;
+  margin-bottom: 10px;
+  overflow: hidden;
+
+  border-radius: 20px;
+  background: linear-gradient(
+    180deg,
+    #c8c5b9 0%,
+    #e6e1d3 100%
+  );
+
+  box-shadow:
+    inset 0 1px 3px rgba(78, 60, 35, 0.25),
+    0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.character-page__exp-fill {
+  height: 100%;
+  border-radius: inherit;
+
+  background: linear-gradient(
+    180deg,
+    #c6ec76 0%,
+    #8bc54a 50%,
+    #58a037 100%
+  );
+
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  transition: width 250ms ease;
+}
+
+.character-page__bonus {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+
+  min-height: 28px;
+  margin-top: 6px;
+  padding: 5px 7px;
+  box-sizing: border-box;
+
+  border: 1px solid rgba(204, 155, 78, 0.28);
+  border-radius: 8px;
+
+  background: linear-gradient(
+    180deg,
+    #fff2bd 0%,
+    #ffe09a 100%
+  );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 2px 3px rgba(116, 78, 36, 0.08);
+
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.character-page__bonus + .character-page__bonus {
+  background: linear-gradient(
+    180deg,
+    #fff8e9 0%,
+    #f2dfb9 100%
+  );
+}
+
+.character-page__bonus strong {
+  color: #4d8f36;
+}
+
+/* ========================================
+   Equipment Slots
+======================================== */
+
+.character-page__slots {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+
+  margin-bottom: 8px;
+}
+
+.character-page__slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+
+  min-width: 0;
+  height: 69px;
+
+  border: 2px solid #d6a36c;
+  border-radius: 14px;
+
+  background: linear-gradient(
+    165deg,
+    #fff9e7 0%,
+    #ffedc8 52%,
+    #f4d7a5 100%
+  );
+
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -2px 0 rgba(193, 137, 66, 0.15),
+    0 3px 0 rgba(155, 102, 46, 0.4),
+    0 5px 8px rgba(83, 53, 21, 0.12);
+}
+
+.character-page__slot-image {
+  display: block;
+  width: 39px;
+  height: 39px;
+  object-fit: contain;
+
+  filter: drop-shadow(0 2px 2px rgba(91, 58, 23, 0.16));
+}
+
+.character-page__slot strong {
+  color: #54371f;
+  font-size: 9px;
+  font-weight: 800;
+  white-space: nowrap;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+/* ========================================
+   Equipment Upgrade
+======================================== */
+
+.character-page__upgrade {
+  padding: 10px 9px 11px;
+
+  border: 3px solid #c89b62;
+  border-radius: 20px;
+
+  background: linear-gradient(
+    160deg,
+    #fffaf0 0%,
+    #fff0d2 48%,
+    #f4dfb8 100%
+  );
+
+  box-shadow:
+    inset 0 3px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -3px 0 rgba(185, 130, 60, 0.14),
+    0 5px 0 rgba(155, 102, 46, 0.5),
+    0 8px 16px rgba(85, 52, 20, 0.16);
+}
+
+.character-page__upgrade-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.character-page__upgrade-heading h2 {
+  margin: 0;
+
+  color: #54371f;
+  font-size: 17px;
+  font-weight: 900;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.character-page__upgrade-heading span {
+  padding: 3px 6px;
+  border: 1px solid rgba(106, 166, 66, 0.35);
+  border-radius: 10px;
+
+  background: linear-gradient(
+    180deg,
+    #f1ffd9 0%,
+    #d9efb5 100%
+  );
+
+  color: #4d9438;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.character-page__upgrade-desc {
+  margin: 6px 0 10px;
+
+  text-align: center;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+/* ========================================
+   Upgrade Stage Track
+======================================== */
+
+.character-page__stage-track {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin: 0 8px 7px;
+}
+
+.character-page__stage-track::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  left: 10px;
+
+  height: 3px;
+
+  background: linear-gradient(
+    90deg,
+    #d9ac62 0%,
+    #c69a63 100%
+  );
+
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+  transform: translateY(-50%);
+}
+
+.character-page__stage {
+  position: relative;
+  z-index: 1;
+
+  display: grid;
+  place-items: center;
+
+  width: 27px;
+  height: 27px;
+  flex-shrink: 0;
+
+  border: 2px solid #c69a63;
+  border-radius: 50%;
+
+  background: linear-gradient(
+    180deg,
+    #fffdf3 0%,
+    #f4dfbb 100%
+  );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 2px 0 rgba(155, 102, 46, 0.35);
+
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.character-page__stage.is-active {
+  border-color: #d29b32;
+
+  background: linear-gradient(
+    180deg,
+    #fff3a0 0%,
+    #ffd24c 55%,
+    #edab27 100%
+  );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 2px 0 #b87e2a,
+    0 2px 6px rgba(214, 157, 40, 0.2);
+}
+
+/* ========================================
+   Upgrade Stage Cards
+======================================== */
+
+.character-page__stage-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.character-page__stage-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+
+  min-width: 0;
+  padding: 5px 2px;
+
+  border: 1px solid #e1bb86;
+  border-radius: 9px;
+
+  background: linear-gradient(
+    180deg,
+    #fff7e3 0%,
+    #ffe9bd 100%
+  );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 2px 0 rgba(174, 119, 53, 0.23);
+
+  text-align: center;
+  font-size: 9px;
+}
+
+.character-page__stage-card.is-next {
+  border: 2px solid #e8a820;
+
+  background: linear-gradient(
+    180deg,
+    #fff3b6 0%,
+    #ffd775 100%
+  );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 2px 0 #c28a2f,
+    0 2px 7px rgba(218, 156, 39, 0.18);
+}
+
+.character-page__stage-card strong {
+  font-weight: 900;
+}
+
+.character-page__stage-card small {
+  font-size: 9px;
+}
+
+/* ========================================
+   Upgrade Button
+======================================== */
+
+.character-page__upgrade-button {
+  display: block;
+  width: 60%;
+  min-height: 31px;
+  margin: 9px auto 0;
+  padding: 5px 10px;
+
+  border: 1px solid #4d9c35;
+  border-radius: 20px;
+
+  background: linear-gradient(
+    180deg,
+    #b5e56d 0%,
+    #83c64a 38%,
+    #4b9d34 100%
+  );
+
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.5),
+    0 3px 0 #367d2b,
+    0 5px 8px rgba(42, 91, 30, 0.2);
+
+  color: #fff;
+  text-shadow: 0 1px 1px rgba(37, 83, 24, 0.55);
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease,
+    filter 120ms ease;
+}
+
+.character-page__upgrade-button:not(:disabled):hover {
+  filter: brightness(1.06);
+}
+
+.character-page__upgrade-button:not(:disabled):active {
+  transform: translateY(2px);
+
+  box-shadow:
+    inset 0 2px 3px rgba(37, 83, 24, 0.16),
+    0 1px 0 #367d2b;
+}
+
+.character-page__upgrade-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ========================================
+   Messages
+======================================== */
+
+.character-page__upgrade-message,
+.character-page__notice {
+  margin: 9px 0 0;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.character-page__notice {
+  color: #a45b2c;
+}
+
+.character-page__loading {
+  padding: 35px 12px;
+  text-align: center;
+  font-size: 13px;
+}
+
+/* ========================================
+   Responsive
+======================================== */
+
+@media (max-width: 360px) {
+  .character-page {
+    padding-right: 6px;
+    padding-left: 6px;
+  }
+
+  .character-page__title {
+    font-size: 17px;
+  }
+
+  .character-page__hero {
+    grid-template-columns: 38% minmax(0, 62%);
+  }
+
+  .character-page__stats {
+    padding: 9px 7px;
+  }
+
+  .character-page__character-image {
+    max-width: 125px;
+    height: 140px;
+  }
+
+  .character-page__slot-image {
+    width: 36px;
+    height: 36px;
+  }
+
+  .character-page__slot strong {
+    font-size: 8px;
+  }
+
+  .character-page__upgrade-heading h2 {
+    font-size: 15px;
+  }
+}
