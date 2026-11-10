@@ -18,6 +18,7 @@
   --monster-size: clamp(44px, 17cqw, 68px);
   --monster-height: var(--monster-size);
   --strike-gap: calc(var(--monster-size) / 2 + var(--lion-height) * 0.35);
+  --counter-distance: max(0px, calc(36cqw - var(--strike-gap)));
 }
 
 .runner-game__scene[data-small-target='true'] {
@@ -30,7 +31,7 @@
   bottom: var(--ground);
   left: var(--player-home);
   width: max(0px, var(--monster-position) - var(--player-home) - var(--strike-gap));
-  transform: translateX(calc(var(--advance, 0) * 100%));
+  transform: translateX(calc(var(--advance, 0) * 100% - var(--lion-knockback, 0px)));
   pointer-events: none;
 }
 
@@ -44,6 +45,13 @@
   /* All four frames share the same belt anchor on the sprite canvas. */
   transform: translateX(-46.13%);
   filter: drop-shadow(0 3px 2px rgb(0 0 0 / 15%));
+}
+
+.runner-game__character--hurt {
+  width: calc(var(--lion-height) * 384 / 280);
+  background: url('/game/combat/counters/lion.png') no-repeat;
+  background-size: 200% 200%;
+  transform: translateX(-46.615%);
 }
 
 .runner-game__scene[data-traveling='true'] .runner-game__character {
@@ -71,7 +79,7 @@
   left: var(--monster-position);
   width: var(--monster-size);
   height: var(--monster-height);
-  transform: translateX(calc(-50% + var(--recoil, 0px)));
+  transform: translateX(calc(-50% + var(--recoil, 0px) - var(--monster-lunge, 0) * var(--counter-distance)));
   transform-origin: center bottom;
   pointer-events: none;
 }
@@ -84,6 +92,17 @@
   height: 100%;
   object-fit: contain;
   object-position: center bottom;
+}
+
+.runner-game__monster-attack {
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  width: calc(var(--monster-size) * 288 / 120);
+  aspect-ratio: 288 / 256;
+  transform: translateX(-50%);
+  background-repeat: no-repeat;
+  background-size: 400% 200%;
 }
 
 .runner-game__monster-image--hit {

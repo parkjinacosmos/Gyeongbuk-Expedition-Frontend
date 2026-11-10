@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { preload } from 'react-dom';
 
+import { getRegionDesign } from '../../regions';
 import './GameScene.css';
 
 interface GameSceneProps {
@@ -18,6 +19,10 @@ const LION_FRAMES = {
   strike: '/game/combat/lion-strike.png',
   recover: '/game/combat/lion-recover.png',
 } as const;
+
+const LION_HURT_IMAGE = '/game/combat/counters/lion.png';
+const LION_HURT_POSITIONS = ['0% 0%', '100% 0%', '0% 100%', '100% 100%'];
+const COUNTER_COLUMNS = ['0%', '33.333333%', '66.666667%', '100%'];
 
 const APPLE_FRAMES = [
   { idle: '/game/apple.png', hit: '/game/combat/apple-hit.png' },
@@ -44,9 +49,11 @@ function monsterFrames(kind: string | undefined, isSmall: boolean) {
 }
 
 type LionPose = keyof typeof LION_FRAMES;
+type CounterFrame = 0 | 1 | 2 | 3;
 
 interface Monster {
   id: number;
+  isSmall: boolean;
   hp: number;
   damage: number;
   pose: 'idle' | 'hit' | 'dying';
@@ -54,13 +61,21 @@ interface Monster {
 
 interface CombatFrame {
   lionPose: LionPose;
+  counterFrame: CounterFrame | null;
   monster: Monster | null;
 }
 
 const SPAWN_INTERVAL = 4000;
 const TRAVEL_RAMP_DURATION = 160;
 const MAX_HP = 100;
-const STRIKE_DAMAGE = MAX_HP; // 기존 충돌은 한 번에 몬스터를 처치했다.
+// 첫 전투도 기존 4초 정산 구간 안에 처치할 시간을 확보합니다.
+const FIRST_SPAWN_DELAY = 1100;
+const COUNTER_CHANCE = 0.3;
+const COUNTER_IMPACT_AT = 120;
+const COUNTER_RECOIL_AT = 240;
+const COUNTER_RECOVER_AT = 390;
+const COUNTER_DURATION = 560;
+const LION_KNOCKBACK = 11;
 
 const APPROACH_AT = 160;
 const PREPARE_AT = 345;
@@ -111,6 +126,17 @@ function lionMotion(time: number): { pose: LionPose; advance: number } {
   return { pose: 'recover', advance: 1 - ease(progress) };
 }
 
+function counterFrameAt(time: number): CounterFrame {
+  if (time < COUNTER_IMPACT_AT) return 0;
+  if (time < COUNTER_RECOIL_AT) return 1;
+  if (time < COUNTER_RECOVER_AT) return 2;
+  return 3;
+}
+
+function startCounter(): number | null {
+  return Math.random() < COUNTER_CHANCE ? 0 : null;
+}
+
 function playCombat(
   style: CSSStyleDeclaration,
   getSpeed: () => 1 | 2,
@@ -119,13 +145,15 @@ function playCombat(
 ): () => void {
   let animationId = 0;
   let previousTime: number | null = null;
-  let timeToSpawn = SPAWN_INTERVAL;
+  let timeToSpawn = FIRST_SPAWN_DELAY;
   let travelElapsed = 0;
   let attackTime = 0;
+  let counterTime: number | null = null;
   let nextId = 0;
   let currentMonster: Monster | null = null;
   let renderedMonster: Monster | null = null;
   let renderedPose: LionPose = 'ready';
+  let renderedCounter: CounterFrame | null = null;
   let previousAdvance = 0;
 
   function animate(timestamp: number) {
@@ -149,17 +177,22 @@ function playCombat(
     timeToSpawn -= elapsed;
 
     if (!currentMonster && timeToSpawn <= 0) {
-      currentMonster = { id: nextId++, hp: MAX_HP, damage: 0, pose: 'idle' };
+      const id = nextId++;
+      currentMonster = { id, isSmall: id % 2 === 1, hp: MAX_HP, damage: 0, pose: 'idle' };
+      counterTime = startCounter();
       timeToSpawn = SPAWN_INTERVAL;
       travelElapsed = 0;
       attackTime = 0;
+    } else if (currentMonster && counterTime !== null) {
+      counterTime += elapsed * speed;
+      if (counterTime >= COUNTER_DURATION) counterTime = null;
     } else if (currentMonster) {
       const previousAttackTime = attackTime;
       // 배속은 장면 연출에만 적용하고 등장 간격과 보상 시간은 실시간을 사용한다.
       attackTime += elapsed * speed;
 
       if (previousAttackTime < STRIKE_AT && attackTime >= STRIKE_AT) {
-        const damage = Math.min(STRIKE_DAMAGE, currentMonster.hp);
+        const damage = currentMonster.isSmall ? MAX_HP : MAX_HP / 2;
         currentMonster = {
           ...currentMonster,
           hp: currentMonster.hp - damage,
@@ -176,12 +209,14 @@ function playCombat(
       }
 
       if (currentMonster.hp > 0 && attackTime >= CYCLE_DURATION) {
-        attackTime -= CYCLE_DURATION;
+        attackTime = 0;
+        counterTime = startCounter();
       }
 
       if (currentMonster.pose === 'dying' && attackTime >= STRIKE_AT + HIT_DURATION + DEATH_DURATION) {
         currentMonster = null;
         attackTime = 0;
+        counterTime = null;
       }
     }
 
@@ -189,6 +224,21 @@ function playCombat(
     if (advance !== previousAdvance) {
       style.setProperty('--advance', String(advance));
       previousAdvance = advance;
+    }
+
+    const counterFrame = counterTime === null ? null : counterFrameAt(counterTime);
+    if (counterTime !== null) {
+      const lunge = counterTime < COUNTER_IMPACT_AT
+        ? ease(counterTime / COUNTER_IMPACT_AT)
+        : 1 - ease(Math.min(1, (counterTime - COUNTER_IMPACT_AT) / (COUNTER_RECOVER_AT - COUNTER_IMPACT_AT)));
+      const knockback = counterTime < COUNTER_RECOIL_AT
+        ? ease(Math.max(0, counterTime - COUNTER_IMPACT_AT) / (COUNTER_RECOIL_AT - COUNTER_IMPACT_AT))
+        : 1 - ease((counterTime - COUNTER_RECOIL_AT) / (COUNTER_DURATION - COUNTER_RECOIL_AT));
+      style.setProperty('--monster-lunge', String(lunge));
+      style.setProperty('--lion-knockback', (knockback * LION_KNOCKBACK) + 'px');
+    } else if (renderedCounter !== null) {
+      style.setProperty('--monster-lunge', '0');
+      style.setProperty('--lion-knockback', '0px');
     }
 
     if (currentMonster?.pose === 'hit') {
@@ -204,10 +254,11 @@ function playCombat(
       style.setProperty('--death-progress', String(progress));
     }
 
-    if (renderedPose !== pose || renderedMonster !== currentMonster) {
+    if (renderedPose !== pose || renderedMonster !== currentMonster || renderedCounter !== counterFrame) {
       renderedPose = pose;
       renderedMonster = currentMonster;
-      setFrame({ lionPose: pose, monster: currentMonster });
+      renderedCounter = counterFrame;
+      setFrame({ lionPose: pose, counterFrame, monster: currentMonster });
     }
 
     animationId = requestAnimationFrame(animate);
@@ -228,14 +279,19 @@ export default function GameScene({
   const speedRef = useRef(speed);
   const [frame, setFrame] = useState<CombatFrame>({
     lionPose: 'ready',
+    counterFrame: null,
     monster: null,
   });
 
-  const isAndong = regionId === 2;
+  const design = getRegionDesign(regionId);
   const monsterKind = MONSTER_KIND_BY_REGION[regionId];
-  const pieceName = specialtyName ?? (isAndong ? '간고등어' : '사과');
-  const { monster } = frame;
-  const isSmall = monster !== null && monster.id % 2 === 1;
+  const pieceName = specialtyName ?? design.product;
+  const pieceImage = regionId === 1
+    ? APPLE_FRAMES[0].idle
+    : regionId === 2 ? '/regions/andong-mackerel.png' : design.image;
+  const { monster, counterFrame } = frame;
+  const isSmall = monster?.isSmall ?? false;
+  const counterImage = '/game/combat/counters/' + (monsterKind ?? 'apple') + '.png';
   const monsterImages = monsterFrames(monsterKind, isSmall);
 
   useEffect(() => {
@@ -244,7 +300,9 @@ export default function GameScene({
       preload(idle, { as: 'image' });
       preload(hit, { as: 'image' });
     }
-  }, [monsterKind]);
+    preload(counterImage, { as: 'image' });
+    preload(LION_HURT_IMAGE, { as: 'image' });
+  }, [monsterKind, counterImage]);
 
   useEffect(() => {
     speedRef.current = speed;
@@ -276,7 +334,7 @@ export default function GameScene({
             <img
               className="runner-game__monster-image"
               src={monsterImages.idle}
-              hidden={monster.pose === 'hit'}
+              hidden={monster.pose === 'hit' || counterFrame !== null}
               alt=""
               draggable={false}
             />
@@ -287,6 +345,16 @@ export default function GameScene({
               alt=""
               draggable={false}
             />
+
+            {counterFrame !== null && (
+              <span
+                className="runner-game__monster-attack"
+                style={{
+                  backgroundImage: 'url("' + counterImage + '")',
+                  backgroundPosition: COUNTER_COLUMNS[counterFrame] + (isSmall ? ' 100%' : ' 0%'),
+                }}
+              />
+            )}
 
             <div
               className="runner-game__apple-health"
@@ -316,15 +384,21 @@ export default function GameScene({
               key={pose}
               className="runner-game__character"
               src={src}
-              hidden={(monster ? frame.lionPose : 'step') !== pose}
+              hidden={counterFrame !== null || (monster ? frame.lionPose : 'step') !== pose}
               alt=""
               draggable={false}
             />
           ))}
+          {counterFrame !== null && (
+            <span
+              className="runner-game__character runner-game__character--hurt"
+              style={{ backgroundPosition: LION_HURT_POSITIONS[counterFrame] }}
+            />
+          )}
         </div>
 
         <div className="runner-game__pieces">
-          <img src={isAndong ? '/regions/andong-mackerel.png' : APPLE_FRAMES[0].idle} alt="" />
+          <img src={pieceImage} alt="" />
           <span>
             현재 보유: {pieceName} 조각{' '}
             {collectedPieces.toLocaleString()}개

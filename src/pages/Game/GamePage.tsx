@@ -13,11 +13,10 @@ import GameScene from '../../components/GameScene/GameScene';
 import GameMenu from '../../components/GameMenu/GameMenu';
 import RewardModal from '../../components/RewardModal/RewardModal';
 
-import appleImage from '../../assets/explore/apple.png';
-import mackerelImage from '../../assets/explore/mackerel.png';
 import goldImage from '../../assets/explore/gold.png';
 import treasureIcon from '../../assets/explore/treasure.png';
 
+import { getRegionDesign } from '../../regions';
 import { regionBackgroundStyle } from './regionBackgrounds';
 import './GamePage.css';
 
@@ -238,10 +237,7 @@ export default function GamePage({
 
   const pieces = currentRegion?.specialty.pieces ?? 0;
 
-  const currentRegionImage =
-    user?.cur_region.id === 2
-      ? mackerelImage
-      : appleImage;
+  const currentRegionImage = getRegionDesign(regionId).image;
 
   const capSeconds = reward?.cap_seconds || MAX_SECONDS;
 
@@ -465,6 +461,7 @@ export default function GamePage({
               specialtyName={
                 result.gained.pieces.name
               }
+              specialtyImage={getRegionDesign(result.gained.pieces.region_id).image}
               dropRateBp={
                 result.gained.pieces.drop_rate_bp
               }

@@ -3,8 +3,6 @@ import { useEffect, useRef } from 'react';
 import treasureIcon from '../../assets/explore/treasure.png';
 import happyLion from '../../assets/explore/happy-lion.png';
 import goldImage from '../../assets/explore/gold.png';
-import appleImage from '../../assets/explore/apple.png';
-import mackerelImage from '../../assets/explore/mackerel.png';
 
 import './RewardModal.css';
 
@@ -21,6 +19,7 @@ interface RewardModalProps {
   totalPieces: number;
   explorationSeconds: number;
   specialtyName?: string;
+  specialtyImage: string;
   dropRateBp: number;
   mobsDefeated: number;
   onClose: () => void;
@@ -48,14 +47,6 @@ function formatDuration(seconds: number): string {
   return `${safeSeconds}초`;
 }
 
-function getSpecialtyImage(name: string): string {
-  if (name.includes('고등어')) {
-    return mackerelImage;
-  }
-
-  return appleImage;
-}
-
 // ========================================
 // Reward Modal
 // ========================================
@@ -69,6 +60,7 @@ export default function RewardModal({
   totalPieces,
   explorationSeconds,
   specialtyName = '사과',
+  specialtyImage,
   dropRateBp,
   mobsDefeated,
   onClose,
@@ -76,8 +68,6 @@ export default function RewardModal({
 }: RewardModalProps) {
   const confirmButtonRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
-
-  const specialtyImage = getSpecialtyImage(specialtyName);
 
   // ========================================
   // Modal Keyboard Handling
