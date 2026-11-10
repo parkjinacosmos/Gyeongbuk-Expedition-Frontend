@@ -1,3 +1,4 @@
+import { clearSession } from './session';
 import { REGION_DESIGNS } from '../regions';
 
 const API_BASE_URL = (
@@ -26,6 +27,8 @@ export interface ExploreUser {
   level: number;
   exp: number;
   exp_to_next_level: number;
+  level_exp?: number;
+  level_exp_required?: number;
   gold: number;
   level_gold_bonus_percent: number;
   equipment: {
@@ -178,7 +181,7 @@ async function request<T>(
     const error = await response.json().catch(() => null);
 
     if (response.status === 401) {
-      localStorage.removeItem('access_token');
+      clearSession();
     }
 
     throw new ApiError(
@@ -689,7 +692,7 @@ export const exploreApi = {
   }> {
     return USE_MOCK
       ? mockApi.getRegions()
-      : request<{ regions: ExploreRegion[] }>('/regions');
+      : request<{ regions: ExploreRegion[] }>('/regions?include_inactive=true');
   },
 
   getIdleReward(): Promise<IdleRewardPreview> {

@@ -1,3 +1,4 @@
+import { clearSession } from './session';
 import type {
   ExploreUser,
   SettledReward,
@@ -88,7 +89,7 @@ async function request<T>(
     const error = await response.json().catch(() => null);
 
     if (response.status === 401) {
-      localStorage.removeItem('access_token');
+      clearSession();
     }
 
     throw new CharacterApiError(

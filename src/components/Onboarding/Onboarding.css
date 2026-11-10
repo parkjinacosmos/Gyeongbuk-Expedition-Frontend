@@ -1,0 +1,83 @@
+.onboarding {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  padding: 24px 16px;
+  background: #f9f2dc url('/game/background.png') center / cover no-repeat;
+}
+
+.onboarding__card {
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 340px);
+  padding: 24px 20px;
+  border: 2px solid #be903e;
+  border-radius: 20px;
+  background: linear-gradient(#fffce0, #ffe7aa);
+  box-shadow: 0 6px 12px #71502140;
+  color: #593719;
+  text-align: center;
+}
+
+.onboarding__character {
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 8px;
+  object-fit: contain;
+}
+
+.onboarding__card h1 {
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.onboarding__card > p {
+  margin-top: 4px;
+  font-size: 14px;
+}
+
+.onboarding__label {
+  margin-top: 20px;
+  font-size: 13px;
+  font-weight: 800;
+  text-align: left;
+}
+
+.onboarding__card input {
+  height: 44px;
+  margin-top: 6px;
+  padding: 0 12px;
+  border: 1.5px solid #be903e;
+  border-radius: 12px;
+  background: #fffdf2;
+  color: #593719;
+  font: inherit;
+  font-size: 16px;
+}
+
+.onboarding__card > .onboarding__error {
+  margin-top: 8px;
+  color: #b3261e;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.onboarding__card button {
+  height: 46px;
+  margin-top: 16px;
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(#8ccf4d, #5da52f);
+  color: #fff;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.onboarding__card button:disabled {
+  background: #cdbb95;
+  cursor: default;
+}
