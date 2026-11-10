@@ -8,4 +8,6 @@ body {
   font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  /* 화면 폭이 넓을 때 게임 화면 주변을 전투·지역 화면과 같은 초록으로 채웁니다. */
+  background: #9ccf80;
 }
