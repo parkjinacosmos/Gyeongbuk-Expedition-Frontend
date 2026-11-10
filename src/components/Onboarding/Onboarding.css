@@ -2,10 +2,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  max-width: 402px;
   min-height: 100dvh;
-  margin: 0 auto;
   padding: 24px 16px;
   background: #f9f2dc url('/game/background.png') center / cover no-repeat;
 }
