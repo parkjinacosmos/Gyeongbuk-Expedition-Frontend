@@ -9,7 +9,8 @@
   overflow-x: clip;
   overflow-y: visible;
 
-  background: #a9d76a;
+  /* 화면 주변은 다른 화면과 같은 초록으로 맞춥니다. */
+  background: #9ccf80;
   color: #593719;
   font-family: 'Noto Sans KR', sans-serif;
 }
@@ -31,6 +32,9 @@
   height: auto;
   margin: 0 auto;
   overflow: visible;
+
+  /* 배경 그림 아래로 내용이 길어질 때의 바탕색은 기존 색을 유지합니다. */
+  background: #a9d76a;
 }
 
 /* ========================================
