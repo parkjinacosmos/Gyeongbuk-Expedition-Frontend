@@ -50,3 +50,7 @@ export function regionBackgroundStyle(regionId: number): CSSProperties {
     '--artwork-road-depth': roadDepth(bg) / bg.height,
   } as CSSProperties;
 }
+
+export function regionBackgroundImage(regionId: number): string {
+  return (REGION_BACKGROUNDS[regionId] ?? REGION_BACKGROUNDS[1]).image;
+}

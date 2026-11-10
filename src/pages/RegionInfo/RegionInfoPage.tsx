@@ -8,13 +8,13 @@ import {
 
 import GameMenu from '../../components/GameMenu/GameMenu';
 
-import appleImage from '../../assets/explore/apple.png';
 import applePieceImage from '../../assets/explore/apple-piece.png';
-import mackerelImage from '../../assets/explore/mackerel.png';
 import goldImage from '../../assets/explore/gold.png';
 import profileImage from '../../assets/explore/profile.png';
 import menuImage from '../../assets/explore/menu.png';
 
+import { getRegionDesign } from '../../regions';
+import { regionBackgroundImage } from '../Game/regionBackgrounds';
 import './RegionInfoPage.css';
 
 // ========================================
@@ -23,6 +23,7 @@ import './RegionInfoPage.css';
 
 interface RegionInfoPageProps {
   regionId: number;
+  onSelectRegion: (regionId: number) => void;
   onBack: () => void;
   onStartExplore: () => void;
   onOpenQuiz: () => void;
@@ -37,17 +38,13 @@ interface PendingMove {
 // Region Design Data
 // ========================================
 
-const regionDesigns = {
+const regionIllustrations: Partial<Record<number, { subtitle: string; background: string }>> = {
   1: {
-    product: '사과',
     subtitle: '청송 사과 농장',
-    image: appleImage,
     background: '/game/background.png',
   },
   2: {
-    product: '간고등어',
     subtitle: '간고등어 나루터',
-    image: mackerelImage,
     background: '/regions/andong-background.png',
   },
 };
@@ -67,14 +64,12 @@ function getErrorMessage(error: unknown): string {
 // ========================================
 
 export default function RegionInfoPage({
-  regionId,
+  regionId: selectedRegionId,
+  onSelectRegion,
   onBack,
   onStartExplore,
   onOpenQuiz,
 }: RegionInfoPageProps) {
-  const [selectedRegionId, setSelectedRegionId] =
-    useState(regionId);
-
   const [user, setUser] =
     useState<ExploreUser | null>(null);
 
@@ -135,15 +130,6 @@ export default function RegionInfoPage({
   }, []);
 
   // ========================================
-  // Sync Selected Region
-  // ========================================
-
-  useEffect(() => {
-    setSelectedRegionId(regionId);
-    pendingMove.current = null;
-  }, [regionId]);
-
-  // ========================================
   // Region Data
   // ========================================
 
@@ -155,9 +141,9 @@ export default function RegionInfoPage({
     (item) => item.id === user?.cur_region.id,
   );
 
-  const design =
-    regionDesigns[selectedRegionId as 1 | 2] ??
-    regionDesigns[2];
+  const design = getRegionDesign(selectedRegionId);
+  const illustration = regionIllustrations[selectedRegionId];
+  const previousRegion = regions.find((item) => item.id === region?.unlock?.region_id);
 
   const isCurrent =
     region != null &&
@@ -179,6 +165,9 @@ export default function RegionInfoPage({
 
   const requirementName =
     unlock?.specialty_name ?? '사과';
+  const requirementImage = unlock && unlock.region_id !== 1
+    ? getRegionDesign(unlock.region_id).image
+    : applePieceImage;
 
   // 해금된 지역은 100%, 잠긴 지역은 실제 진행도
   const progress = isComplete
@@ -204,11 +193,11 @@ export default function RegionInfoPage({
   function handleSelectRegion(id: number) {
     if (movingRef.current) return;
 
-    if (id !== 1 && id !== 2) return;
+    if (id === selectedRegionId) return;
 
     pendingMove.current = null;
 
-    setSelectedRegionId(id);
+    onSelectRegion(id);
     setMessage('');
   }
 
@@ -378,11 +367,7 @@ export default function RegionInfoPage({
 
             <strong>
               <img
-                src={
-                  user?.cur_region.id === 2
-                    ? mackerelImage
-                    : appleImage
-                }
+                src={getRegionDesign(user?.cur_region.id ?? 1).image}
                 alt=""
               />
 
@@ -436,7 +421,7 @@ export default function RegionInfoPage({
             <div className="region-info-illustration">
               <img
                 className="region-info-illustration__background"
-                src={design.background}
+                src={illustration?.background ?? regionBackgroundImage(region.id)}
                 alt={`${region.name} 지역 배경`}
               />
 
@@ -445,7 +430,7 @@ export default function RegionInfoPage({
                   {region.code} {region.name}
                 </strong>
 
-                <span>{design.subtitle}</span>
+                <span>{illustration?.subtitle ?? region.specialty.name}</span>
               </div>
 
               <img
@@ -459,9 +444,9 @@ export default function RegionInfoPage({
                 src={
                   selectedRegionId === 2
                     ? '/regions/andong-mackerel.png'
-                    : appleImage
+                    : design.image
                 }
-                alt={design.product}
+                alt={region.specialty.name}
               />
             </div>
 
@@ -472,8 +457,8 @@ export default function RegionInfoPage({
             <div className="region-info-requirement">
               <div className="region-info-requirement__top">
                 <img
-                  src={applePieceImage}
-                  alt="사과 조각"
+                  src={requirementImage}
+                  alt={`${requirementName} 조각`}
                 />
 
                 <div>
@@ -559,15 +544,15 @@ export default function RegionInfoPage({
                 type="button"
                 className="region-info-actions__back"
                 onClick={() => {
-                  if (selectedRegionId === 2) {
-                    handleSelectRegion(1);
+                  if (previousRegion) {
+                    handleSelectRegion(previousRegion.id);
                   } else {
                     onBack();
                   }
                 }}
                 disabled={moving}
               >
-                {selectedRegionId === 2
+                {previousRegion
                   ? '‹ 이전 지역 보기'
                   : '‹ 지도로 돌아가기'}
               </button>
@@ -599,35 +584,19 @@ export default function RegionInfoPage({
               className="region-info-region-list"
               aria-label="지역 선택"
             >
-              <button
-                type="button"
-                className={
-                  selectedRegionId === 1
-                    ? 'region-info-region-list__active'
-                    : ''
-                }
-                aria-pressed={selectedRegionId === 1}
-                onClick={() => handleSelectRegion(1)}
-                disabled={moving}
-              >
-                <img src={appleImage} alt="" />
-                <span>청송</span>
-              </button>
-
-              <button
-                type="button"
-                className={
-                  selectedRegionId === 2
-                    ? 'region-info-region-list__active'
-                    : ''
-                }
-                aria-pressed={selectedRegionId === 2}
-                onClick={() => handleSelectRegion(2)}
-                disabled={moving}
-              >
-                <img src={mackerelImage} alt="" />
-                <span>안동</span>
-              </button>
+              {regions.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  className={item.id === selectedRegionId ? 'region-info-region-list__active' : ''}
+                  aria-pressed={item.id === selectedRegionId}
+                  onClick={() => handleSelectRegion(item.id)}
+                  disabled={moving}
+                >
+                  <img src={getRegionDesign(item.id).image} alt="" />
+                  <span>{item.name}</span>
+                </button>
+              ))}
             </nav>
           </div>
         </section>

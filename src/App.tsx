@@ -16,6 +16,7 @@ import { hasSession, onSessionExpired } from './api/session';
 import { OPEN_CHAT_EVENT } from './api/chat';
 
 import type { NavigationItem } from './components/BottomNavigation/BottomNavigation';
+import { REGION_DESIGNS } from './regions';
 
 // ========================================
 // Types
@@ -117,7 +118,7 @@ function getSavedRegionId(): number {
     readStorage(STORAGE_KEYS.selectedRegionId),
   );
 
-  return saved === 1 || saved === 2 ? saved : 2;
+  return REGION_DESIGNS.some((region) => region.id === saved) ? saved : 2;
 }
 
 function getSavedQuizReturn(): QuizReturnScreen {
@@ -223,11 +224,6 @@ export default function App() {
   };
 
   const openRegionInfo = (regionId: number) => {
-    // 현재 MVP 지원 지역
-    if (regionId !== 1 && regionId !== 2) {
-      return;
-    }
-
     setSelectedRegionId(regionId);
     navigateExplore('region-info');
   };
@@ -255,6 +251,7 @@ export default function App() {
         return (
           <RegionInfoPage
             regionId={selectedRegionId}
+            onSelectRegion={setSelectedRegionId}
             onBack={openMap}
             onStartExplore={openGame}
             onOpenQuiz={openQuiz}
