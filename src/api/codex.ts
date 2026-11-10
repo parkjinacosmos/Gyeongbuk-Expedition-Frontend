@@ -1,3 +1,4 @@
+import { clearSession } from './session';
 import { exploreApi } from './explore';
 
 // ========================================
@@ -102,7 +103,7 @@ async function request<T>(path: string): Promise<T> {
       await response.json().catch(() => null);
 
     if (response.status === 401) {
-      localStorage.removeItem('access_token');
+      clearSession();
     }
 
     throw new Error(
@@ -234,9 +235,9 @@ export const codexApi = {
     const query =
       regionId === undefined
         ? ''
-        : `?region_id=${regionId}`;
+        : `&region_id=${regionId}`;
 
-    return request<CodexListResponse>(`/codex${query}`);
+    return request<CodexListResponse>(`/codex?include_inactive=true${query}`);
   },
 
   getDetail(specialtyId: number): Promise<CodexDetail> {

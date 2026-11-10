@@ -1,11 +1,13 @@
+import { clearSession } from './session';
 import type {
   ExploreUser,
   SettledReward,
 } from './explore';
 
-const API_BASE_URL =
+const API_BASE_URL = (
   import.meta.env.VITE_API_BASE_URL ??
-  'http://localhost:3000/api/v1';
+  'http://localhost:3000/api/v1'
+).replace(/\/+$/, '');
 
 const USE_MOCK =
   import.meta.env.VITE_USE_MOCK_API !== 'false';
@@ -87,7 +89,7 @@ async function request<T>(
     const error = await response.json().catch(() => null);
 
     if (response.status === 401) {
-      localStorage.removeItem('access_token');
+      clearSession();
     }
 
     throw new CharacterApiError(

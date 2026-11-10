@@ -1,22 +1,4 @@
-/* ========================================
-   Game Container
-======================================== */
-
-.runner-game {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  overflow: hidden;
-  background: transparent;
-  box-sizing: border-box;
-}
-
 .runner-game,
-.runner-game * {
-  box-sizing: border-box;
-}
-
 .runner-game__scene {
   position: relative;
   width: 100%;
@@ -24,105 +6,146 @@
   min-height: 0;
   overflow: hidden;
   background: transparent;
-  touch-action: none;
+}
+
+.runner-game__scene {
+  container-type: inline-size;
   user-select: none;
-  -webkit-user-select: none;
-  cursor: grab;
+  --ground: 101px;
+  --player-home: 30%;
+  --monster-position: 66%;
+  --lion-height: clamp(58px, 19.5cqw, 78px);
+  --monster-size: clamp(44px, 17cqw, 68px);
+  --monster-height: var(--monster-size);
+  --strike-gap: calc(var(--monster-size) / 2 + var(--lion-height) * 0.35);
+  --counter-distance: max(0px, calc(36cqw - var(--strike-gap)));
 }
 
-.runner-game__scene:active {
-  cursor: grabbing;
+.runner-game__scene[data-small-target='true'] {
+  --monster-size: clamp(28px, 10cqw, 38px);
 }
-
-/* ========================================
-   Disable Duplicate Background
-======================================== */
-
-.runner-game__background {
-  display: none;
-}
-
-/* ========================================
-   Player
-======================================== */
 
 .runner-game__player {
   position: absolute;
   z-index: 5;
-  left: 23%;
-  width: 90px;
-  height: 124px;
-  transform: translate(-50%, -50%);
+  bottom: var(--ground);
+  left: var(--player-home);
+  width: max(0px, var(--monster-position) - var(--player-home) - var(--strike-gap));
+  transform: translateX(calc(var(--advance, 0) * 100% - var(--lion-knockback, 0px)));
   pointer-events: none;
 }
 
 .runner-game__character {
   position: absolute;
-  top: 0;
-  left: 11px;
-  width: 68px;
-  height: 88px;
-  object-fit: contain;
+  bottom: 0;
+  left: 0;
+  width: auto;
+  height: var(--lion-height);
+  max-width: none;
+  /* All four frames share the same belt anchor on the sprite canvas. */
+  transform: translateX(-46.13%);
   filter: drop-shadow(0 3px 2px rgb(0 0 0 / 15%));
-
-  animation:
-    lion-run calc(0.3s / var(--game-speed, 1))
-    ease-in-out infinite alternate;
 }
 
-/* ========================================
-   Apples
-======================================== */
+.runner-game__character--hurt {
+  width: calc(var(--lion-height) * 384 / 280);
+  background: url('/game/combat/counters/lion.png') no-repeat;
+  background-size: 200% 200%;
+  transform: translateX(-46.615%);
+}
 
-.runner-game__apple {
+.runner-game__scene[data-traveling='true'] .runner-game__character {
+  animation: runner-game-run 240ms ease-in-out infinite alternate;
+}
+
+.runner-game__scene[data-traveling='true'][data-speed='2'] .runner-game__character {
+  animation-duration: 120ms;
+}
+
+@keyframes runner-game-run {
+  from {
+    translate: 0 0;
+  }
+
+  to {
+    translate: 0 -3px;
+  }
+}
+
+.runner-game__monster {
   position: absolute;
   z-index: 4;
-  width: 90px;
-  height: 110px;
-  transform: translate(-50%, -50%);
+  bottom: var(--ground);
+  left: var(--monster-position);
+  width: var(--monster-size);
+  height: var(--monster-height);
+  transform: translateX(calc(-50% + var(--recoil, 0px) - var(--monster-lunge, 0) * var(--counter-distance)));
+  transform-origin: center bottom;
   pointer-events: none;
 }
 
-.runner-game__apple-content {
+.runner-game__monster-image {
   position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-
-.runner-game__apple-image {
-  display: block;
-  position: relative;
-  width: 38px;
-  height: 38px;
-  flex-shrink: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
-
-  animation:
-    apple-float calc(0.5s / var(--game-speed, 1))
-    ease-in-out infinite alternate;
+  object-position: center bottom;
 }
 
-.runner-game__apple-content--large
-.runner-game__apple-image {
-  width: 68px;
-  height: 68px;
+.runner-game__monster-attack {
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  width: calc(var(--monster-size) * 288 / 120);
+  aspect-ratio: 288 / 256;
+  transform: translateX(-50%);
+  background-repeat: no-repeat;
+  background-size: 400% 200%;
 }
 
-/* ========================================
-   Apple Health Bar
-======================================== */
+.runner-game__monster-image--hit {
+  /* The effect is wider than the body. Allow room for the outline and lightning. */
+  left: -6%;
+  width: 112%;
+  height: 110%;
+}
+
+.runner-game__monster[data-aligned='true'] {
+  height: auto;
+}
+
+/* Each pair uses the same canvas, with a 120px body centered in 192px. */
+.runner-game__monster[data-aligned='true'] .runner-game__monster-image {
+  left: -30%;
+  width: 160%;
+  height: auto;
+}
+
+.runner-game__monster[data-aligned='true'] .runner-game__monster-image:first-child {
+  position: relative;
+  display: block;
+}
+
+.runner-game__monster[data-aligned='true'] .runner-game__monster-image:first-child[hidden] {
+  visibility: hidden;
+}
+
+.runner-game__monster[data-pose='dying'] {
+  opacity: calc(1 - var(--death-progress, 0));
+  transform: translateX(-50%) scale(calc(1 - var(--death-progress, 0) * 0.25));
+}
 
 .runner-game__apple-health {
-  position: relative;
+  position: absolute;
   z-index: 2;
+  top: calc(100% + 6px);
+  left: 50%;
   width: 55px;
   height: 13px;
-  flex-shrink: 0;
   padding: 2px;
+  transform: translateX(-50%);
   border: 2px solid #674329;
   border-radius: 10px;
   background: #493329;
@@ -133,34 +156,23 @@
   width: 100%;
   height: 100%;
   border-radius: 5px;
-  background: linear-gradient(
-    180deg,
-    #b3f17c,
-    #5db64b
-  );
+  background: linear-gradient(180deg, #b3f17c, #5db64b);
   transition: width 0.15s ease-out;
 }
 
-/* ========================================
-   Death Animation
-======================================== */
-
-.runner-game__apple--dying {
-  animation: apple-death 0.45s ease-out forwards;
+.runner-game__damage {
+  position: absolute;
+  z-index: 2;
+  bottom: calc(100% + 3px);
+  left: 50%;
+  color: #a73925;
+  font-size: 17px;
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 0 2px #fff5dd, 0 1px 2px #fff5dd;
+  opacity: calc(1 - var(--hit-progress, 0) * 0.55);
+  transform: translate(-50%, calc(var(--hit-progress, 0) * -12px));
 }
-
-.runner-game__apple--dying .runner-game__apple-image {
-  animation: none;
-}
-
-.runner-game__apple--dying .runner-game__apple-health {
-  opacity: 0;
-  transition: opacity 0.12s ease-out;
-}
-
-/* ========================================
-   Collected Pieces
-======================================== */
 
 .runner-game__pieces {
   position: absolute;
@@ -198,63 +210,7 @@
   object-fit: contain;
 }
 
-/* ========================================
-   Animations
-======================================== */
-
-@keyframes lion-run {
-  from {
-    transform: translateY(0) rotate(-2deg);
-  }
-
-  to {
-    transform: translateY(-5px) rotate(2deg);
-  }
-}
-
-@keyframes apple-float {
-  from {
-    transform: translateY(0);
-  }
-
-  to {
-    transform: translateY(-4px);
-  }
-}
-
-@keyframes apple-death {
-  0% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
-
-  45% {
-    opacity: 0.65;
-    transform: translate(-50%, -50%) scale(1.08);
-  }
-
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -65%) scale(0.75);
-  }
-}
-
-/* ========================================
-   Responsive
-======================================== */
-
 @media (max-width: 360px) {
-  .runner-game__player {
-    width: 82px;
-    height: 118px;
-  }
-
-  .runner-game__character {
-    left: 10px;
-    width: 62px;
-    height: 82px;
-  }
-
   .runner-game__pieces {
     min-width: 160px;
     font-size: 11px;

@@ -1,6 +1,10 @@
-const API_BASE_URL =
+import { clearSession } from './session';
+import { REGION_DESIGNS } from '../regions';
+
+const API_BASE_URL = (
   import.meta.env.VITE_API_BASE_URL ??
-  'http://localhost:3000/api/v1';
+  'http://localhost:3000/api/v1'
+).replace(/\/+$/, '');
 
 const USE_MOCK = import.meta.env.VITE_USE_MOCK_API !== 'false';
 
@@ -23,6 +27,8 @@ export interface ExploreUser {
   level: number;
   exp: number;
   exp_to_next_level: number;
+  level_exp?: number;
+  level_exp_required?: number;
   gold: number;
   level_gold_bonus_percent: number;
   equipment: {
@@ -175,7 +181,7 @@ async function request<T>(
     const error = await response.json().catch(() => null);
 
     if (response.status === 401) {
-      localStorage.removeItem('access_token');
+      clearSession();
     }
 
     throw new ApiError(
@@ -194,8 +200,33 @@ async function request<T>(
 // ========================================
 
 const initialTime = new Date().toISOString();
+const MOCK_PROGRESS_KEY = 'gyeongbuk-explore-progress';
+const REQUIRED_PIECES = 20;
 
-let mockUser: ExploreUser = {
+interface MockProgress {
+  user: ExploreUser;
+  regions: Array<{ id: number; pieces: number; unlockedAt: string | null }>;
+  mobStates: Array<[number, { carry: number; fails: number }]>;
+}
+
+function readMockProgress(): MockProgress | null {
+  try {
+    const saved: MockProgress | null = JSON.parse(
+      localStorage.getItem(MOCK_PROGRESS_KEY) ?? 'null',
+    );
+    return saved &&
+      REGION_DESIGNS.some((region) => region.id === saved.user?.cur_region?.id) &&
+      Array.isArray(saved.regions) && Array.isArray(saved.mobStates)
+      ? saved
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+const savedMockProgress = USE_MOCK ? readMockProgress() : null;
+
+let mockUser: ExploreUser = savedMockProgress?.user ?? {
   id: 1,
   name: '원정대장',
   level: 3,
@@ -223,52 +254,43 @@ let mockUser: ExploreUser = {
   server_time: initialTime,
 };
 
-const mockRegions: ExploreRegion[] = [
-  {
-    id: 1,
-    code: 'R01',
-    name: '청송',
-    sort_order: 1,
-    gold_per_minute: 5,
-    exp_per_minute: 1,
+const mockRegionRates: Readonly<Record<number, { gold: number; exp: number; dropBp: number }>> = {
+  1: { gold: 5, exp: 1, dropBp: 60 },
+  2: { gold: 8, exp: 2, dropBp: 55 },
+  3: { gold: 12, exp: 3, dropBp: 50 },
+  4: { gold: 17, exp: 4, dropBp: 45 },
+  5: { gold: 23, exp: 5, dropBp: 40 },
+  6: { gold: 30, exp: 6, dropBp: 36 },
+  7: { gold: 38, exp: 8, dropBp: 33 },
+  8: { gold: 48, exp: 10, dropBp: 30 },
+};
+
+type MockRegion = Omit<ExploreRegion, 'status' | 'unlock'>;
+
+const mockRegions: MockRegion[] = REGION_DESIGNS.map(({ id, name, product }, index) => {
+  const { gold, exp, dropBp } = mockRegionRates[id];
+  const saved = savedMockProgress?.regions.find((region) => region.id === id);
+  return {
+    id,
+    code: `R${String(id).padStart(2, '0')}`,
+    name,
+    sort_order: index + 1,
+    gold_per_minute: gold,
+    exp_per_minute: exp,
     description: null,
-    piece_drop_bp: 60,
-    specialty: {
-      id: 1,
-      name: '사과',
-      pieces: 20,
-      required_pieces: 20,
-    },
-    status: 'CURRENT',
-    unlocked_at: initialTime,
-    unlock: null,
-  },
-  {
-    id: 2,
-    code: 'R02',
-    name: '안동',
-    sort_order: 2,
-    gold_per_minute: 8,
-    exp_per_minute: 2,
-    description: null,
-    piece_drop_bp: 55,
-    specialty: {
-      id: 2,
-      name: '간고등어',
-      pieces: 0,
-      required_pieces: 20,
-    },
-    status: 'UNLOCKED',
-    unlocked_at: initialTime,
-    unlock: {
-      region_id: 1,
-      region_name: '청송',
-      specialty_name: '사과',
-      required_pieces: 20,
-      current_pieces: 20,
-    },
-  },
-];
+    piece_drop_bp: dropBp,
+    specialty: { id, name: product, pieces: saved?.pieces ?? 0, required_pieces: REQUIRED_PIECES },
+    unlocked_at: saved?.unlockedAt ?? (index === 0 ? initialTime : null),
+  };
+});
+
+// 이전에 저장한 조각으로 이미 충족한 조건도 복원합니다.
+for (const [index, region] of mockRegions.entries()) {
+  const previous = mockRegions[index - 1];
+  if (previous && previous.specialty.pieces >= previous.specialty.required_pieces) {
+    region.unlocked_at ??= mockUser.last_settled_at;
+  }
+}
 
 // 동일 요청 키 중복 수령 방지
 const mockClaimResults = new Map<string, IdleRewardClaim>();
@@ -277,9 +299,69 @@ const mockClaimResults = new Map<string, IdleRewardClaim>();
 const mockMobStates = new Map<
   number,
   { carry: number; fails: number }
->();
+>(savedMockProgress?.mobStates);
 
-function getMockRegion(): ExploreRegion | undefined {
+function syncMockProgress(): void {
+  const saved = readMockProgress();
+  if (!saved || saved.user.state_version <= mockUser.state_version) return;
+
+  mockUser = saved.user;
+  for (const region of mockRegions) {
+    const progress = saved.regions.find((item) => item.id === region.id);
+    if (!progress) continue;
+    region.specialty.pieces = progress.pieces;
+    region.unlocked_at = progress.unlockedAt;
+  }
+  mockMobStates.clear();
+  for (const [regionId, state] of saved.mobStates) {
+    mockMobStates.set(regionId, state);
+  }
+}
+
+function withMockProgress<T>(update: () => Promise<T>): Promise<T> {
+  const apply = () => {
+    syncMockProgress();
+    return update();
+  };
+
+  return navigator.locks
+    ? navigator.locks.request(MOCK_PROGRESS_KEY, apply)
+    : apply();
+}
+
+function saveMockProgress(): void {
+  const progress: MockProgress = {
+    user: mockUser,
+    regions: mockRegions.map((region) => ({
+      id: region.id,
+      pieces: region.specialty.pieces,
+      unlockedAt: region.unlocked_at,
+    })),
+    mobStates: [...mockMobStates],
+  };
+  try {
+    localStorage.setItem(MOCK_PROGRESS_KEY, JSON.stringify(progress));
+  } catch {
+    // 저장소를 쓸 수 없는 경우 현재 세션에서만 진행합니다.
+  }
+}
+
+if (USE_MOCK && !savedMockProgress) {
+  saveMockProgress();
+}
+
+function getMockUnlock(index: number): ExploreRegion['unlock'] {
+  const previous = mockRegions[index - 1];
+  return previous ? {
+    region_id: previous.id,
+    region_name: previous.name,
+    specialty_name: previous.specialty.name,
+    required_pieces: previous.specialty.required_pieces,
+    current_pieces: previous.specialty.pieces,
+  } : null;
+}
+
+function getMockRegion(): MockRegion | undefined {
   return mockRegions.find(
     (region) => region.id === mockUser.cur_region.id,
   );
@@ -416,8 +498,14 @@ function settleMockReward(
 
   const settledAt = new Date().toISOString();
 
+  const unlockedRegions: SettledReward['unlocked_regions'] = [];
   if (region) {
     region.specialty.pieces += gainedPieces;
+    const next = mockRegions[region.sort_order];
+    if (next && !next.unlocked_at && region.specialty.pieces >= region.specialty.required_pieces) {
+      next.unlocked_at = settledAt;
+      unlockedRegions.push({ id: next.id, name: next.name });
+    }
   }
 
   mockUser = {
@@ -456,7 +544,7 @@ function settleMockReward(
         carry_seconds: nextCarry,
         consecutive_fails: consecutiveFails,
       },
-      unlocked_regions: [],
+      unlocked_regions: unlockedRegions,
     },
     leveled_up: experience.level > previousLevel,
     previous_level: previousLevel,
@@ -471,6 +559,7 @@ function settleMockReward(
 
 const mockApi = {
   async getUser(): Promise<ExploreUser> {
+    syncMockProgress();
     return structuredClone({
       ...mockUser,
       server_time: new Date().toISOString(),
@@ -480,18 +569,21 @@ const mockApi = {
   async getRegions(): Promise<{
     regions: ExploreRegion[];
   }> {
+    syncMockProgress();
     return {
-      regions: mockRegions.map((region) => ({
+      regions: mockRegions.map((region, index) => ({
         ...structuredClone(region),
+        unlock: getMockUnlock(index),
         status:
           region.id === mockUser.cur_region.id
             ? 'CURRENT'
-            : 'UNLOCKED',
+            : region.unlocked_at ? 'UNLOCKED' : 'LOCKED',
       })),
     };
   },
 
   async getIdleReward(): Promise<IdleRewardPreview> {
+    syncMockProgress();
     return calculateMockReward();
   },
 
@@ -506,6 +598,7 @@ const mockApi = {
     }
 
     const result = settleMockReward(true);
+    saveMockProgress();
 
     mockClaimResults.set(
       idempotencyKey,
@@ -541,6 +634,15 @@ const mockApi = {
       );
     }
 
+    if (!target.unlocked_at) {
+      throw new ApiError(
+        409,
+        'REGION_LOCKED',
+        '지역 해금에 필요한 조각이 부족합니다.',
+        getMockUnlock(target.sort_order - 1),
+      );
+    }
+
     const previousRegion = structuredClone(
       mockUser.cur_region,
     );
@@ -558,6 +660,7 @@ const mockApi = {
       },
       state_version: mockUser.state_version + 1,
     };
+    saveMockProgress();
 
     return {
       gold: mockUser.gold,
@@ -589,7 +692,7 @@ export const exploreApi = {
   }> {
     return USE_MOCK
       ? mockApi.getRegions()
-      : request<{ regions: ExploreRegion[] }>('/regions');
+      : request<{ regions: ExploreRegion[] }>('/regions?include_inactive=true');
   },
 
   getIdleReward(): Promise<IdleRewardPreview> {
@@ -602,7 +705,7 @@ export const exploreApi = {
     idempotencyKey: string,
   ): Promise<IdleRewardClaim> {
     return USE_MOCK
-      ? mockApi.claimIdleReward(idempotencyKey)
+      ? withMockProgress(() => mockApi.claimIdleReward(idempotencyKey))
       : request<IdleRewardClaim>('/idle-reward', {
           method: 'POST',
           headers: {
@@ -616,7 +719,7 @@ export const exploreApi = {
     idempotencyKey: string = crypto.randomUUID(),
   ): Promise<MoveRegionResponse> {
     return USE_MOCK
-      ? mockApi.moveRegion(targetRegionId, idempotencyKey)
+      ? withMockProgress(() => mockApi.moveRegion(targetRegionId, idempotencyKey))
       : request<MoveRegionResponse>('/regions/move', {
           method: 'POST',
           headers: {

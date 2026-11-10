@@ -5,6 +5,8 @@ import './GameMenu.css';
 import quizIcon from '../../assets/explore/quiz.png';
 import mapIcon from '../../assets/explore/map.png';
 import settingsIcon from '../../assets/explore/settings.png';
+import guideIcon from '../../assets/popup/lion.png';
+import { OPEN_CHAT_EVENT } from '../../api/chat';
 
 interface GameMenuProps {
   onClose: () => void;
@@ -67,6 +69,11 @@ export default function GameMenu({
     onOpenQuiz();
   }
 
+  function handleOpenChat() {
+    onClose();
+    window.dispatchEvent(new Event(OPEN_CHAT_EVENT));
+  }
+
   function handleOpenMap() {
     onClose();
     onOpenMap();
@@ -97,6 +104,28 @@ export default function GameMenu({
         className="game-menu"
         aria-label="탐험 메뉴"
       >
+        {/* Chat */}
+        <button
+          type="button"
+          onClick={handleOpenChat}
+        >
+          <span className="game-menu__content">
+            <img
+              src={guideIcon}
+              alt=""
+              className="game-menu__icon"
+            />
+            <span>탐험 도우미</span>
+          </span>
+
+          <span
+            className="game-menu__arrow"
+            aria-hidden="true"
+          >
+            ›
+          </span>
+        </button>
+
         {/* Quiz */}
         <button
           type="button"
